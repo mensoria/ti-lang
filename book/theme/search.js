@@ -7,7 +7,14 @@
   button.type = 'button';
   button.className = 'icon-button';
   button.id = 'ti-search-toggle';
-  button.textContent = '⌕';
+  const svg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  svg.setAttribute('viewBox', '0 0 24 24'); svg.setAttribute('width', '18'); svg.setAttribute('height', '18');
+  svg.setAttribute('fill', 'none'); svg.setAttribute('stroke', 'currentColor'); svg.setAttribute('stroke-width', '1.7');
+  svg.setAttribute('aria-hidden', 'true');
+  const circle = document.createElementNS(svg.namespaceURI, 'circle');
+  circle.setAttribute('cx', '10.5'); circle.setAttribute('cy', '10.5'); circle.setAttribute('r', '6.5');
+  const handle = document.createElementNS(svg.namespaceURI, 'path'); handle.setAttribute('d', 'M16 16l4.5 4.5');
+  svg.append(circle, handle); button.append(svg);
   button.title = zh ? '搜索本书 (/)' : 'Search this book (/)';
   button.setAttribute('aria-label', button.title);
   button.setAttribute('aria-expanded', 'false');

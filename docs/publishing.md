@@ -12,7 +12,7 @@ both manuscripts together.
 `docs/` and `examples/` are maintained sources. `scripts/build_book.py` generates
 21 matching chapters per language into ignored `book/{en,zh-CN}/src/`; edit the
 manuscripts, not generated chapters. Configuration, theme and landing page live
-under `book/`. Generated site/build evidence are ignored outputs under `site/`
+under `book/`; `book/{en,zh-CN}/home.md` owns the informative reader homepages. Generated site/build evidence are ignored outputs under `site/`
 and `dist/`. The build produces online HTML reading editions only.
 
 ## Local build
@@ -36,8 +36,11 @@ prove translation quality or Ti execution conformance.
 ## GitHub Pages
 
 Target: [mensoria.github.io/ti-lang](https://mensoria.github.io/ti-lang/).
-English is under `/en/`; Simplified Chinese under `/zh-CN/`. Each chapter has a
-language switch to the same chapter; stable TI/TC anchors survive switching.
+English is under `/en/`; Simplified Chinese under `/zh-CN/`. The root opens the
+reader directly, defaulting to Simplified Chinese and remembering an explicitly
+selected edition when local storage is available. The top-right language selector
+is the only edition-selection control. It stays on the same chapter; stable TI/TC
+anchors survive switching. There is no separate language-selection landing page.
 
 In repository **Settings → Pages → Build and deployment → Source**, select
 **GitHub Actions**. The `Documentation book` workflow builds/checks pull requests

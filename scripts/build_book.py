@@ -24,16 +24,7 @@ def chapters(lang):
     standard = read(STANDARD, lang)
     sections = re.split(r'(?=^## (?:\d+\.|Appendix [ABC]\.))', standard, flags=re.M)
     assert len(sections) == 16, 'Standard chapter count changed; review slug mapping'
-    pages = {'index.md': sections[0] + (
-        '\n## Reading this book\n\nThe English edition is normative; the Chinese edition translates the same 54 rules. '
-        'Start with the [overview](overview.md) and [approval example](approval.md), then read '
-        '[atomic actions](07-actions.md) and [Mensoria integration](integration.md). '
-        'Appendices contain the full grammar, evidence requirements and canonical fingerprint encoding.\n\n'
-        'This is a design draft, not a released language implementation.\n'
-        if lang == 'en' else
-        '\n## 阅读本书\n\n英文是规范源文，中文完整翻译相同的 54 条规则。建议先读[语言概览](overview.md)与'
-        '[审批示例](approval.md)，再读[原子动作](07-actions.md)和[Mensoria 集成](integration.md)。'
-        '附录提供完整语法、证据要求与规范指纹编码。\n\n本书是设计草案，尚非已发布语言实现。\n') }
+    pages = {'index.md': (ROOT / 'book' / lang / 'home.md').read_text()}
     for slug, content in zip(SLUGS, sections[1:]):
         pages[slug + '.md'] = re.sub(r'^## ', '# ', content, count=1)
     for slug, source in [('overview', 'language'), ('conformance', 'conformance'),
@@ -64,7 +55,7 @@ def chapters(lang):
         if lang == 'zh-CN':
             content = content.replace('[英文源文](index.md)', '[英文源文](../en/01-purpose.html)')
         footer = '\n\n---\n\n' + ('Draft 0.1 · No runtime conformance claimed.' if lang == 'en' else '草案 0.1 · 不声称运行时符合性。')
-        pages[filename] = content.rstrip() + footer + '\n'
+        pages[filename] = content.rstrip() + ('' if filename == 'index.md' else footer) + '\n'
     return pages
 
 
@@ -80,13 +71,22 @@ def generate(lang):
                 (source / name).unlink(missing_ok=True)
     for name, content in pages.items():
         (source / name).write_text(content)
-    order = ['index.md', 'overview.md', *[x + '.md' for x in SLUGS[:12]],
-             'approval.md', 'integration.md', 'roadmap.md',
-             *[x + '.md' for x in SLUGS[12:]], 'conformance.md']
+    groups = [
+        (None, ['index.md']),
+        ('Getting started' if lang == 'en' else '入门', ['overview.md', 'approval.md']),
+        ('Language standard' if lang == 'en' else '语言规范', [x + '.md' for x in SLUGS[:12]]),
+        ('Reference and integration' if lang == 'en' else '参考与集成',
+         [x + '.md' for x in SLUGS[12:]] + ['conformance.md', 'integration.md', 'roadmap.md']),
+    ]
     lines = ['# Summary' if lang == 'en' else '# 目录', '']
-    for filename in order:
-        title = pages[filename].splitlines()[0].removeprefix('# ')
-        lines.append(f'- [{title}]({filename})')
+    for group, filenames in groups:
+        if group:
+            lines.extend(['', '# ' + group, ''])
+        for filename in filenames:
+            title = pages[filename].splitlines()[0].removeprefix('# ')
+            if filename == 'index.md':
+                title = 'Documentation' if lang == 'en' else '文档首页'
+            lines.append(f'- [{title}]({filename})')
     (source / 'SUMMARY.md').write_text('\n'.join(lines) + '\n')
     manifest_path.write_text(json.dumps(list(pages), indent=2) + '\n')
     return len(pages)
@@ -121,7 +121,15 @@ def main():
                             'anchors': re.findall(r'<a id="([^"]+)"></a>', content)})
         (ROOT / 'site' / lang / 'ti-search-index.json').write_text(
             json.dumps(records, ensure_ascii=False) + '\n')
-    shutil.copyfile(ROOT / 'book/landing.html' , ROOT / 'site/index.html')
+    # Fingerprint custom assets so returning readers receive the current UI.
+    for page in (ROOT / 'site').rglob('*.html'):
+        html = page.read_text()
+        for asset in ('book.css', 'language-switch.js', 'search.js'):
+            source = ROOT / 'book/theme' / asset
+            digest = hashlib.sha256(source.read_bytes()).hexdigest()[:12]
+            html = html.replace('../theme/' + asset + '"', '../theme/' + asset + '?v=' + digest + '"')
+        page.write_text(html)
+    shutil.copyfile(ROOT / 'book/landing.html', ROOT / 'site/index.html')
     (ROOT / 'site/.nojekyll').write_text('')
     (ROOT / 'site/404.html').write_text('<!doctype html><html lang="en"><meta charset="utf-8"><title>Page not found — Ti Lang</title><h1>Page not found / 页面不存在</h1><a href="/ti-lang/">Ti Lang documentation / 文档首页</a></html>\n')
     subprocess.run(['python3', str(ROOT / 'scripts/check_book.py'), '--html'], check=True)
