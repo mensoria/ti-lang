@@ -41,7 +41,7 @@ def check_html():
                 assert unquote(url.fragment) in pages[target].ids,(path,link,'missing anchor')
             checked+=1
     for lang in ('en','zh-CN'):
-        for name in ('index.html','print.html'):
+        for name in ('index.html',):
             assert (site/lang/name).exists(),(lang,name)
         index = json.loads((site/lang/'ti-search-index.json').read_text())
         assert len(index) == 21
@@ -49,8 +49,9 @@ def check_html():
             target = (site/lang/record['url']).resolve()
             assert target in pages
             assert all(anchor in pages[target].ids for anchor in record['anchors'])
-        printed = pages[(site/lang/'print.html').resolve()].ids
-        assert all(f'ti-{i:03}' in printed for i in range(1,55))
+        assert not (site/lang/'print.html').exists(), (lang, 'print output is disabled')
+        edition_ids = set().union(*(page.ids for path,page in pages.items() if path.parent == (site/lang).resolve()))
+        assert all(f'ti-{i:03}' in edition_ids for i in range(1,55))
         assert any('审批' in record['text'] for record in index) if lang == 'zh-CN' else any('approval' in record['text'].lower() for record in index)
     assert not list(site.rglob('*.epub')), 'EPUB is outside requested scope'
     print(f'HTML: {len(pages)} pages; {checked} local links/assets/anchors checked.')

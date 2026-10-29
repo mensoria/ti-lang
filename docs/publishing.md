@@ -13,7 +13,7 @@ both manuscripts together.
 21 matching chapters per language into ignored `book/{en,zh-CN}/src/`; edit the
 manuscripts, not generated chapters. Configuration, theme and landing page live
 under `book/`. Generated site/build evidence are ignored outputs under `site/`
-and `dist/`. The build produces online HTML and single-page print editions only.
+and `dist/`. The build produces online HTML reading editions only.
 
 ## Local build
 
@@ -30,7 +30,7 @@ python3 -m http.server 8000 --bind 127.0.0.1 --directory site
 Open `http://127.0.0.1:8000/` for the landing page. The production project base path
 is `/ti-lang/`; serve under that prefix when testing the production 404 route.
 The build checks clause/case coverage, identical grammar, manuscript links,
-generated HTML targets and anchors, assets, and print/search output. It does not
+generated HTML targets and anchors, assets, and search output. It does not
 prove translation quality or Ti execution conformance.
 
 ## GitHub Pages

@@ -18,8 +18,7 @@ git-repository-url = "https://github.com/mensoria/ti-lang"
 site-url = "/ti-lang/en/"
 
 [output.html.print]
-enable = true
-page-break = true
+enable = false
 
 [output.html.search]
 enable = false

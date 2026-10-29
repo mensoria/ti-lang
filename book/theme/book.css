@@ -12,7 +12,6 @@
 .ti-language-switch:hover { color: var(--links); text-decoration: underline; }
 a:focus-visible,button:focus-visible { outline: 2px solid var(--links); outline-offset: 4px; }
 @media(max-width:600px) { .content { font-size:1.6rem; } .menu-title { font-size: 1.25rem; } .ti-language-switch { margin:0; padding:0 5px; } }
-@media print { .ti-language-switch { display:none; } .content { font-size:11pt; line-height:1.6; } .content table { display:table; font-size:9pt; } pre { white-space:pre-wrap; overflow-wrap:anywhere; } }
 .ti-search { border:1px solid var(--table-border-color); border-radius:6px; padding:20px; margin:24px 0; scroll-margin-top:70px; }
 .ti-search label { display:block; font-weight:650; margin-bottom:10px; }
 .ti-search input { box-sizing:border-box; width:100%; padding:12px; border:1px solid var(--table-border-color); border-radius:4px; background:var(--bg); color:var(--fg); font:inherit; }
@@ -20,4 +19,3 @@ a:focus-visible,button:focus-visible { outline: 2px solid var(--links); outline-
 .ti-search li { margin-bottom:20px; }
 .ti-search li p { font-size:14px; margin:4px 0; }
 #ti-search-toggle { font-size:28px; }
-@media print { .ti-search { display:none; } }

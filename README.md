@@ -54,7 +54,7 @@ copied into this repository.
 ## Bilingual book and publication
 
 The online book provides 21 chapters per edition, complete English and Simplified
-Chinese manuscripts, chapter-aligned language switching, search, and print editions.
+Chinese manuscripts, chapter-aligned language switching, and search.
 The English standard is normative; translated clauses retain the same identifiers.
 
 ```sh
