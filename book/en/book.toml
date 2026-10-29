@@ -1,0 +1,25 @@
+[book]
+title = "Ti Lang — Language Standard and Reference"
+authors = ["Mensoria"]
+language = "en"
+src = "src"
+description = "Declarative business language · Draft 0.1 · ti/0.1"
+
+[build]
+create-missing = false
+
+[output.html]
+default-theme = "light"
+preferred-dark-theme = "navy"
+no-section-label = true
+additional-css = ["../theme/book.css"]
+additional-js = ["../theme/language-switch.js", "../theme/search.js"]
+git-repository-url = "https://github.com/mensoria/ti-lang"
+site-url = "/ti-lang/en/"
+
+[output.html.print]
+enable = true
+page-break = true
+
+[output.html.search]
+enable = false

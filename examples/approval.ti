@@ -1,0 +1,75 @@
+// Illustrative syntax only. There is no Ti compiler or executor yet.
+module leave version 1;
+
+entity LeaveRequest {
+    field applicant: UserId;
+    field reason: String;
+    field days: Int64;
+    field rejectionReason: String?;
+
+    state status {
+        Draft initial;
+        Pending;
+        Approved final;
+        Rejected final;
+        Withdrawn final;
+    }
+
+    invariant positiveDays: days > 0;
+    invariant meaningfulReason: nonempty(reason);
+    invariant rejectionHasReason:
+        status != Rejected or nonempty(rejectionReason);
+}
+
+policy Applicant(request: LeaveRequest) =
+    actor.id == request.applicant;
+
+policy Reviewer(request: LeaveRequest) =
+    actor.hasRole("leave.reviewer") and actor.id != request.applicant;
+
+create LeaveRequest(reason: String, days: Int64) {
+    allow actor.hasRole("leave.applicant");
+    set applicant = actor.id;
+    set reason = trim(input.reason);
+    set days = input.days;
+}
+
+action EditDraft(reason: String, days: Int64) on LeaveRequest {
+    from Draft to Draft;
+    allow Applicant(self);
+    set reason = trim(input.reason);
+    set days = input.days;
+}
+
+action Submit on LeaveRequest {
+    from Draft to Pending;
+    allow Applicant(self);
+}
+
+action Approve on LeaveRequest {
+    from Pending to Approved;
+    allow Reviewer(self);
+    emit LeaveApproved {
+        requestId = self.id;
+        applicant = self.applicant;
+        days = self.days;
+    }
+}
+
+action Reject(reason: String) on LeaveRequest {
+    from Pending to Rejected;
+    allow Reviewer(self);
+    require nonempty(input.reason) else "rejection_reason_required";
+    set rejectionReason = trim(input.reason);
+}
+
+action Withdraw on LeaveRequest {
+    from Pending to Withdrawn;
+    allow Applicant(self);
+}
+
+event LeaveApproved {
+    requestId: LeaveRequestId;
+    applicant: UserId;
+    days: Int64;
+}

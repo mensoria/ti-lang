@@ -1,0 +1,9 @@
+.cache/
+site/
+dist/
+book/en/book/
+book/zh-CN/book/
+__pycache__/
+.DS_Store
+book/en/src/
+book/zh-CN/src/

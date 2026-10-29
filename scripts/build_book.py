@@ -1,0 +1,140 @@
+#!/usr/bin/env python3
+"""Generate two chapter-aligned mdBook editions from authoritative manuscripts."""
+from pathlib import Path
+import hashlib
+import json
+import re
+import shutil
+import subprocess
+
+ROOT = Path(__file__).resolve().parents[1]
+LANGUAGES = ('en', 'zh-CN')
+STANDARD = 'ti-language-standard'
+SLUGS = ['01-purpose', '02-lexical', '03-modules', '04-types', '05-expressions',
+         '06-entities', '07-actions', '08-events', '09-operations', '10-evolution',
+         '11-diagnostics', '12-extensions', 'a-grammar', 'b-evidence', 'c-fingerprint']
+
+
+def read(name, lang):
+    suffix = '' if lang == 'en' else '.zh-CN'
+    return (ROOT / 'docs' / f'{name}{suffix}.md').read_text()
+
+
+def chapters(lang):
+    standard = read(STANDARD, lang)
+    sections = re.split(r'(?=^## (?:\d+\.|Appendix [ABC]\.))', standard, flags=re.M)
+    assert len(sections) == 16, 'Standard chapter count changed; review slug mapping'
+    pages = {'index.md': sections[0] + (
+        '\n## Reading this book\n\nThe English edition is normative; the Chinese edition translates the same 54 rules. '
+        'Start with the [overview](overview.md) and [approval example](approval.md), then read '
+        '[atomic actions](07-actions.md) and [Mensoria integration](integration.md). '
+        'Appendices contain the full grammar, evidence requirements and canonical fingerprint encoding.\n\n'
+        'This is a design draft, not a released language implementation.\n'
+        if lang == 'en' else
+        '\n## 阅读本书\n\n英文是规范源文，中文完整翻译相同的 54 条规则。建议先读[语言概览](overview.md)与'
+        '[审批示例](approval.md)，再读[原子动作](07-actions.md)和[Mensoria 集成](integration.md)。'
+        '附录提供完整语法、证据要求与规范指纹编码。\n\n本书是设计草案，尚非已发布语言实现。\n') }
+    for slug, content in zip(SLUGS, sections[1:]):
+        pages[slug + '.md'] = re.sub(r'^## ', '# ', content, count=1)
+    for slug, source in [('overview', 'language'), ('conformance', 'conformance'),
+                         ('integration', 'mensoria-integration'), ('roadmap', 'roadmap')]:
+        pages[slug + '.md'] = read(source, lang)
+    example = (ROOT / 'examples/approval.ti').read_text()
+    if lang == 'zh-CN':
+        example = example.replace('// Illustrative syntax only. There is no Ti compiler or executor yet.',
+                                  '// 说明性语法；目前尚无 Ti 编译器或执行器。')
+    pages['approval.md'] = ('# Approval walkthrough\n\n' if lang == 'en' else '# 审批示例详解\n\n') + (
+        'Illustrative source; not executable. The model implements single-stage leave approval.\n\n'
+        if lang == 'en' else '说明性源码，尚不可执行。模型覆盖单级请假审批。\n\n') + '```text\n' + example + '```\n\n' + (
+        'Draft → Pending → Approved / Rejected / Withdrawn. Draft editing stays in Draft.\n\n'
+        'A reviewer cannot approve their own request. Concurrent approve/withdraw commands compete on one revision. '
+        'Assignments see the old record; events see the candidate. Lost responses require original-operation reconciliation.\n'
+        if lang == 'en' else 'Draft → Pending → Approved／Rejected／Withdrawn；草稿编辑保持 Draft。\n\n'
+        '审批人不能批准自己的申请。并发批准与撤回竞争同一记录版本。赋值读旧记录，事件读候选记录。响应丢失后核对原操作。\n')
+    # Rewrite manuscript links to generated book chapters, preserving one authority.
+    for filename, content in list(pages.items()):
+        content = re.sub(r'\*\*(TI-\d{3})\.\*\*', lambda m: f'<a id="{m[1].lower()}"></a>\n\n{m[0]}', content)
+        content = re.sub(r'^(\| )(TC-\d{3})( \|)', lambda m: f'{m[1]}<a id="{m[2].lower()}"></a>{m[2]}{m[3]}', content, flags=re.M)
+        for stem, dest in [(STANDARD, 'index'), ('language', 'overview'), ('conformance', 'conformance'),
+                           ('mensoria-integration', 'integration'), ('roadmap', 'roadmap')]:
+            content = content.replace(f']({stem}.zh-CN.md)', f']({dest}.md)')
+            content = content.replace(f']({stem}.md)', f']({dest}.md)')
+        content = content.replace('](../examples/approval.ti)', '](approval.md)')
+        # Chinese source's English authority link must go to the English book.
+        if lang == 'zh-CN':
+            content = content.replace('[英文源文](index.md)', '[英文源文](../en/01-purpose.html)')
+        footer = '\n\n---\n\n' + ('Draft 0.1 · No runtime conformance claimed.' if lang == 'en' else '草案 0.1 · 不声称运行时符合性。')
+        pages[filename] = content.rstrip() + footer + '\n'
+    return pages
+
+
+def generate(lang):
+    pages = chapters(lang)
+    source = ROOT / 'book' / lang / 'src'
+    source.mkdir(parents=True, exist_ok=True)
+    # Delete only generator-owned chapter files from previous builds.
+    manifest_path = source / '.generated.json'
+    if manifest_path.exists():
+        for name in json.loads(manifest_path.read_text()):
+            if name not in pages and Path(name).name == name:
+                (source / name).unlink(missing_ok=True)
+    for name, content in pages.items():
+        (source / name).write_text(content)
+    order = ['index.md', 'overview.md', *[x + '.md' for x in SLUGS[:12]],
+             'approval.md', 'integration.md', 'roadmap.md',
+             *[x + '.md' for x in SLUGS[12:]], 'conformance.md']
+    lines = ['# Summary' if lang == 'en' else '# 目录', '']
+    for filename in order:
+        title = pages[filename].splitlines()[0].removeprefix('# ')
+        lines.append(f'- [{title}]({filename})')
+    (source / 'SUMMARY.md').write_text('\n'.join(lines) + '\n')
+    manifest_path.write_text(json.dumps(list(pages), indent=2) + '\n')
+    return len(pages)
+
+
+def main():
+    counts = {lang: generate(lang) for lang in LANGUAGES}
+    subprocess.run(['python3', str(ROOT / 'scripts/check_book.py')], check=True)
+    executable = ROOT / '.cache/tools/mdbook'
+    if not executable.is_file():
+        found = shutil.which('mdbook')
+        if not found:
+            raise SystemExit('Run python3 scripts/bootstrap_mdbook.py first.')
+        executable = Path(found)
+    version = subprocess.check_output([str(executable), '--version'], text=True).strip()
+    if version != 'mdbook v0.5.4':
+        raise SystemExit(f'Expected mdbook v0.5.4; got {version}')
+    for lang in LANGUAGES:
+        destination = ROOT / 'site' / lang
+        if destination.exists():
+            shutil.rmtree(destination)  # Only builder-owned generated edition output.
+        subprocess.run([str(executable), 'build', str(ROOT / 'book' / lang),
+                        '--dest-dir', str(ROOT / 'site' / lang)], check=True)
+    for lang in LANGUAGES:
+        records = []
+        for name, content in chapters(lang).items():
+            text = re.sub(r'<[^>]+>', '', content)
+            text = re.sub(r'[\\`#*|]', ' ', text)
+            text = re.sub(r'\s+', ' ', text).strip()
+            records.append({'title': content.splitlines()[0].removeprefix('# '),
+                            'url': name.removesuffix('.md') + '.html', 'text': text,
+                            'anchors': re.findall(r'<a id="([^"]+)"></a>', content)})
+        (ROOT / 'site' / lang / 'ti-search-index.json').write_text(
+            json.dumps(records, ensure_ascii=False) + '\n')
+    shutil.copyfile(ROOT / 'book/landing.html' , ROOT / 'site/index.html')
+    (ROOT / 'site/.nojekyll').write_text('')
+    (ROOT / 'site/404.html').write_text('<!doctype html><html lang="en"><meta charset="utf-8"><title>Page not found — Ti Lang</title><h1>Page not found / 页面不存在</h1><a href="/ti-lang/">Ti Lang documentation / 文档首页</a></html>\n')
+    subprocess.run(['python3', str(ROOT / 'scripts/check_book.py'), '--html'], check=True)
+    report = {'edition': 'ti/0.1', 'draft': '0.1', 'mdbook': '0.5.4', 'languages': counts,
+              'normative_clauses': 54, 'conformance_cases': 44,
+              'source_sha256': {str(p.relative_to(ROOT)): hashlib.sha256(p.read_bytes()).hexdigest()
+                                for p in sorted((ROOT / 'docs').glob('*.md'))},
+              'evidence': 'documentation_build_only', 'runtime_conformance': 'not_run',
+              'ci': 'not_run_locally', 'deployment': 'not_confirmed_by_build'}
+    (ROOT / 'dist').mkdir(exist_ok=True)
+    (ROOT / 'dist/build-report.json').write_text(json.dumps(report, ensure_ascii=False, indent=2)+'\n')
+    print('Built bilingual book: site/index.html')
+
+
+if __name__ == '__main__':
+    main()

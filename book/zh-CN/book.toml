@@ -1,0 +1,25 @@
+[book]
+title = "Ti Lang——语言标准与参考手册"
+authors = ["Mensoria"]
+language = "zh-CN"
+src = "src"
+description = "声明式业务语言 · 草案 0.1 · ti/0.1"
+
+[build]
+create-missing = false
+
+[output.html]
+default-theme = "light"
+preferred-dark-theme = "navy"
+no-section-label = true
+additional-css = ["../theme/book.css"]
+additional-js = ["../theme/language-switch.js", "../theme/search.js"]
+git-repository-url = "https://github.com/mensoria/ti-lang"
+site-url = "/ti-lang/zh-CN/"
+
+[output.html.print]
+enable = true
+page-break = true
+
+[output.html.search]
+enable = false

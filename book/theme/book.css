@@ -1,0 +1,23 @@
+:root { --content-max-width: 860px; }
+.light { --bg: #fafaf7; --fg: #202b2e; --sidebar-bg: #f0f2ed; --sidebar-fg: #344442; --sidebar-active: #126b5f; --links: #126b5f; --table-border-color: #d2dcd5; --table-header-bg: #e5ece6; --table-alternate-bg: #f1f4ef; }
+.content { font-family: -apple-system,BlinkMacSystemFont,"Segoe UI","PingFang SC","Microsoft YaHei",sans-serif; font-size: 1.65rem; line-height: 1.85; }
+.content h1 { letter-spacing: -.035em; line-height: 1.25; font-weight: 700; margin: 2rem 0 2.5rem; }
+.content h2 { margin-top: 3rem; line-height: 1.4; }
+.content table { display: block; overflow-x: auto; max-width: 100%; margin: 2rem 0; }
+.content td,.content th { padding: .8rem 1.2rem; text-align: left; }
+.content pre { border: 1px solid var(--table-border-color); border-radius: 6px; padding: 1.5rem; line-height: 1.6; }
+.content a { text-underline-offset: .2em; }
+.content [id^="ti-"],.content [id^="tc-"] { scroll-margin-top: 80px; }
+.ti-language-switch { display: inline-block; color: var(--fg); font-size: 13px; font-weight: 600; margin: 0 8px; padding: 0 8px; line-height: 50px; text-decoration: none; }
+.ti-language-switch:hover { color: var(--links); text-decoration: underline; }
+a:focus-visible,button:focus-visible { outline: 2px solid var(--links); outline-offset: 4px; }
+@media(max-width:600px) { .content { font-size:1.6rem; } .menu-title { font-size: 1.25rem; } .ti-language-switch { margin:0; padding:0 5px; } }
+@media print { .ti-language-switch { display:none; } .content { font-size:11pt; line-height:1.6; } .content table { display:table; font-size:9pt; } pre { white-space:pre-wrap; overflow-wrap:anywhere; } }
+.ti-search { border:1px solid var(--table-border-color); border-radius:6px; padding:20px; margin:24px 0; scroll-margin-top:70px; }
+.ti-search label { display:block; font-weight:650; margin-bottom:10px; }
+.ti-search input { box-sizing:border-box; width:100%; padding:12px; border:1px solid var(--table-border-color); border-radius:4px; background:var(--bg); color:var(--fg); font:inherit; }
+.ti-search ol { padding-left:24px; }
+.ti-search li { margin-bottom:20px; }
+.ti-search li p { font-size:14px; margin:4px 0; }
+#ti-search-toggle { font-size:28px; }
+@media print { .ti-search { display:none; } }
