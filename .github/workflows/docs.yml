@@ -18,13 +18,13 @@ jobs:
     name: Validate and build bilingual book
     runs-on: ubuntu-24.04
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6
       - name: Install verified mdBook 0.5.4
         run: python3 scripts/bootstrap_mdbook.py
       - name: Build and check both editions
         run: python3 scripts/build_book.py
       - name: Upload book and build evidence
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@b7c566a772e6b6bfb58ed0dc250532a479d7789f # v6
         with:
           name: ti-lang-book
           path: |
