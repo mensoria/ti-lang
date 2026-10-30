@@ -13,9 +13,11 @@ metaphor, not a technical guarantee.
 
 ## Status
 
-Design draft, 2026-10-29. This repository contains a proposed language model and
-a reference model. An initial Rust validator, inspectable IR compiler and pure evaluator are now
-available; the database host and full conformance corpus are not implemented. Syntax, file extension, and integration contracts are provisional.
+Draft 0.1, 2026-10-30. Rust compiler, evaluator, strict wire codec, frozen
+artifacts and an optional Mensoria transaction host are implemented. All 44
+numbered regression scenarios are executable against a pinned native backend.
+See [implementation and qualification boundaries](docs/implementation.md); this
+is not a full standard or production conformance claim.
 
 ## First use case
 

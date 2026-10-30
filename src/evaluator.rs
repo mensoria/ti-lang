@@ -11,12 +11,12 @@ pub struct Record {
     pub fields: Map<String, Value>,
     pub state: String,
 }
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Candidate {
     pub record: Record,
     pub events: Vec<Event>,
 }
-#[derive(Debug, Serialize)]
+#[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Event {
     pub name: String,
     pub fields: Map<String, Value>,
@@ -25,7 +25,6 @@ struct Eval<'a> {
     model: &'a Model,
     actor: &'a Actor,
     left: usize,
-    depth: usize,
 }
 fn truth(v: Value) -> Result<bool> {
     if let Value::Bool(b) = v {
@@ -38,109 +37,168 @@ fn trim(s: &str) -> &str {
     s.trim_matches([' ', '\t', '\r', '\n'])
 }
 impl Eval<'_> {
+    /// Explicit work stack: policy expansion consumes the shared node budget
+    /// without adding an implementation-only native-stack recursion limit.
     fn expr(
         &mut self,
         e: &Expr,
         env: &Map<String, Value>,
         records: &Map<String, Record>,
     ) -> Result<Value> {
-        if self.depth >= 256 {
-            return err(
-                "TI_LIMIT",
-                "evaluation nesting exceeds implementation limit",
-            );
+        #[derive(Clone, Copy)]
+        enum Scope<'a> {
+            Root(&'a Map<String, Value>, &'a Map<String, Record>),
+            Policy(&'a Policy, &'a Record),
         }
-        self.depth += 1;
-        let result = self.expr_inner(e, env, records);
-        self.depth -= 1;
-        result
-    }
-    fn expr_inner(
-        &mut self,
-        e: &Expr,
-        env: &Map<String, Value>,
-        records: &Map<String, Record>,
-    ) -> Result<Value> {
-        if self.left == 0 {
-            return err("TI_LIMIT", "evaluation budget exhausted");
+        enum Task<'a> {
+            Node(&'a Expr, Scope<'a>),
+            Not,
+            Left(&'a str, &'a Expr, Scope<'a>),
+            Right(&'a str, Value),
+            Call(&'a str),
         }
-        self.left -= 1;
-        match e {
-            Expr::Lit(v) => Ok(v.clone()),
-            Expr::Ref(n) => env.get(n).cloned().ok_or_else(|| Diagnostic {
-                code: "TI_INPUT".into(),
-                message: format!("missing value {n}"),
-                line: 0,
-                column: 0,
-            }),
-            Expr::Not(x) => Ok(Value::Bool(!truth(self.expr(x, env, records)?)?)),
-            Expr::Binary(op, a, b) => {
-                let a = self.expr(a, env, records)?;
-                if op == "and" && !truth(a.clone())? {
-                    return Ok(Value::Bool(false));
-                }
-                if op == "or" && truth(a.clone())? {
-                    return Ok(Value::Bool(true));
-                }
-                let b = self.expr(b, env, records)?;
-                Ok(Value::Bool(match op.as_str() {
-                    "and" | "or" => truth(b)?,
-                    "==" => a == b,
-                    "!=" => a != b,
-                    _ => {
-                        let (Value::Int64(a), Value::Int64(b)) = (a, b) else {
-                            return err("TI_TYPE", "integer required");
-                        };
-                        let a: i64 = a.parse().map_err(|_| Diagnostic {
-                            code: "TI_INPUT".into(),
-                            message: "invalid integer".into(),
-                            line: 0,
-                            column: 0,
-                        })?;
-                        let b: i64 = b.parse().unwrap();
-                        match op.as_str() {
-                            "<" => a < b,
-                            "<=" => a <= b,
-                            ">" => a > b,
-                            _ => a >= b,
+        let mut tasks = vec![Task::Node(e, Scope::Root(env, records))];
+        let mut stack: Vec<Value> = vec![];
+        while let Some(task) = tasks.pop() {
+            match task {
+                Task::Node(e, scope) => {
+                    if self.left == 0 {
+                        return err("TI_LIMIT", "evaluation budget exhausted");
+                    }
+                    self.left -= 1;
+                    match e {
+                        Expr::Lit(v) => stack.push(v.clone()),
+                        Expr::Ref(n) => {
+                            let value = match scope {
+                                Scope::Root(env, _) => env.get(n).cloned(),
+                                Scope::Policy(p, r) => {
+                                    let entity = &self.model.entities[&p.entity];
+                                    if n == "actor.id" {
+                                        Some(Value::UserId(self.actor.id.clone()))
+                                    } else if n == &format!("{}.id", p.param) {
+                                        Some(Value::Id(IdValue {
+                                            entity: p.entity.clone(),
+                                            id: r.id.clone(),
+                                        }))
+                                    } else if n == &format!("{}.{}", p.param, entity.state) {
+                                        Some(Value::State(r.state.clone()))
+                                    } else if entity.states.contains_key(n) {
+                                        Some(Value::State(n.clone()))
+                                    } else {
+                                        n.strip_prefix(&format!("{}.", p.param))
+                                            .and_then(|f| r.fields.get(f))
+                                            .cloned()
+                                    }
+                                }
+                            };
+                            stack.push(value.ok_or_else(|| Diagnostic {
+                                code: "TI_INPUT".into(),
+                                message: "missing expression binding".into(),
+                                line: 0,
+                                column: 0,
+                            })?);
+                        }
+                        Expr::Not(x) => {
+                            tasks.push(Task::Not);
+                            tasks.push(Task::Node(x, scope));
+                        }
+                        Expr::Binary(op, a, b) => {
+                            tasks.push(Task::Left(op, b, scope));
+                            tasks.push(Task::Node(a, scope));
+                        }
+                        Expr::Call(n, args) => {
+                            if let Some(p) = self.model.policies.get(n) {
+                                let Expr::Ref(arg) = &args[0] else {
+                                    return err("TI_TYPE", "entity argument required");
+                                };
+                                let record = match scope {
+                                    Scope::Root(_, records) => records.get(arg),
+                                    Scope::Policy(parent, record) => {
+                                        if arg == &parent.param {
+                                            Some(record)
+                                        } else {
+                                            None
+                                        }
+                                    }
+                                }
+                                .ok_or_else(|| Diagnostic {
+                                    code: "TI_INPUT".into(),
+                                    message: "missing policy entity".into(),
+                                    line: 0,
+                                    column: 0,
+                                })?;
+                                tasks.push(Task::Node(&p.expr, Scope::Policy(p, record)));
+                            } else {
+                                tasks.push(Task::Call(n));
+                                tasks.push(Task::Node(&args[0], scope));
+                            }
                         }
                     }
-                }))
-            }
-            Expr::Call(n, args) => {
-                if let Some(p) = self.model.policies.get(n) {
-                    let Expr::Ref(arg) = &args[0] else {
-                        return err("TI_TYPE", "entity argument required");
-                    };
-                    let record = records.get(arg).ok_or_else(|| Diagnostic {
-                        code: "TI_INPUT".into(),
-                        message: "missing policy entity".into(),
-                        line: 0,
-                        column: 0,
-                    })?;
-                    let mut penv = values(self.model, &p.entity, &p.param, record);
-                    penv.insert("actor.id".into(), Value::UserId(self.actor.id.clone()));
-                    return self.expr(
-                        &p.expr,
-                        &penv,
-                        &Map::from([(p.param.clone(), record.clone())]),
-                    );
                 }
-                let v = self.expr(&args[0], env, records)?;
-                match (n.as_str(), v) {
-                    ("length", Value::String(s)) => Ok(Value::Int64(s.chars().count().to_string())),
-                    ("trim", Value::String(s)) => Ok(Value::String(trim(&s).into())),
-                    ("nonempty", Value::String(s)) => Ok(Value::Bool(!trim(&s).is_empty())),
-                    ("nonempty", Value::Null) => Ok(Value::Bool(false)),
-                    ("actor.hasRole", Value::String(s)) => {
-                        Ok(Value::Bool(self.actor.roles.contains(&s)))
+                Task::Not => {
+                    let v = stack.pop().expect("validated expression stack");
+                    stack.push(Value::Bool(!truth(v)?));
+                }
+                Task::Left(op, b, scope) => {
+                    let a = stack.pop().expect("validated expression stack");
+                    if (op == "and" && !truth(a.clone())?) || (op == "or" && truth(a.clone())?) {
+                        stack.push(a);
+                    } else {
+                        tasks.push(Task::Right(op, a));
+                        tasks.push(Task::Node(b, scope));
                     }
-                    _ => err("TI_TYPE", "invalid call"),
+                }
+                Task::Right(op, a) => {
+                    let b = stack.pop().expect("validated expression stack");
+                    let result = match op {
+                        "and" | "or" => truth(b)?,
+                        "==" => a == b,
+                        "!=" => a != b,
+                        _ => {
+                            let (Value::Int64(a), Value::Int64(b)) = (a, b) else {
+                                return err("TI_TYPE", "integer required");
+                            };
+                            let a: i64 = a.parse().map_err(|_| Diagnostic {
+                                code: "TI_INPUT".into(),
+                                message: "invalid integer".into(),
+                                line: 0,
+                                column: 0,
+                            })?;
+                            let b: i64 = b.parse().map_err(|_| Diagnostic {
+                                code: "TI_INPUT".into(),
+                                message: "invalid integer".into(),
+                                line: 0,
+                                column: 0,
+                            })?;
+                            match op {
+                                "<" => a < b,
+                                "<=" => a <= b,
+                                ">" => a > b,
+                                _ => a >= b,
+                            }
+                        }
+                    };
+                    stack.push(Value::Bool(result));
+                }
+                Task::Call(n) => {
+                    let v = stack.pop().expect("validated expression stack");
+                    stack.push(match (n, v) {
+                        ("length", Value::String(s)) => Value::Int64(s.chars().count().to_string()),
+                        ("trim", Value::String(s)) => Value::String(trim(&s).into()),
+                        ("nonempty", Value::String(s)) => Value::Bool(!trim(&s).is_empty()),
+                        ("nonempty", Value::Null) => Value::Bool(false),
+                        ("actor.hasRole", Value::String(s)) => {
+                            Value::Bool(self.actor.roles.contains(&s))
+                        }
+                        _ => return err("TI_TYPE", "invalid call"),
+                    });
                 }
             }
         }
+        Ok(stack.pop().expect("validated expression result"))
     }
 }
+
 fn values(m: &Model, entity: &str, prefix: &str, r: &Record) -> Map<String, Value> {
     let mut env = Map::new();
     for (n, v) in &r.fields {
@@ -210,9 +268,6 @@ impl Compiled {
         {
             return err("TI_INPUT", "invalid actor snapshot");
         }
-        if serde_json::to_vec(input).map_or(true, |v| v.len() > 131072) {
-            return err("TI_LIMIT", "encoded harness inputs exceed 128 KiB");
-        }
         if input.len() != o.inputs.len()
             || !o
                 .inputs
@@ -220,6 +275,13 @@ impl Compiled {
                 .all(|(n, t)| input.get(n).is_some_and(|v| valid_value(v, t)))
         {
             return err("TI_INPUT", "input shape or type mismatch");
+        }
+        let encoded: Result<Map<_, _>> = input
+            .iter()
+            .map(|(k, v)| Ok((k, crate::wire::encode_value(v)?)))
+            .collect();
+        if serde_json::to_vec(&encoded?).map_or(true, |v| v.len() > 131072) {
+            return err("TI_LIMIT", "encoded public inputs exceed 128 KiB");
         }
         if o.from.is_some() != old.is_some() {
             return err("TI_INPUT", "action requires matching old-record presence");
@@ -269,7 +331,6 @@ impl Compiled {
             model: m,
             actor,
             left: 100000,
-            depth: 0,
         };
         if !truth(eval.expr(&o.allow, &env, &records)?)? {
             return err("TI_ACCESS_DENIED", "action denied");
@@ -324,9 +385,50 @@ impl Compiled {
                 fields: out,
             });
         }
-        if serde_json::to_vec(&events).map_or(true, |v| v.len() > 131072) {
-            return err("TI_LIMIT", "encoded harness events exceed 128 KiB");
+        let encoded: Result<Vec<_>> = events.iter().map(crate::wire::encode_event).collect();
+        if serde_json::to_vec(&encoded?).map_or(true, |v| v.len() > 131072) {
+            return err("TI_LIMIT", "encoded public events exceed 128 KiB");
         }
         Ok(Candidate { record: r, events })
+    }
+}
+
+impl Compiled {
+    pub fn validate_record(&self, entity: &str, record: &Record) -> Result<()> {
+        let e = self.model.entities.get(entity).ok_or_else(|| Diagnostic {
+            code: "TI_NAME".into(),
+            message: "unknown entity".into(),
+            line: 0,
+            column: 0,
+        })?;
+        if record.fields.len() != e.fields.len()
+            || !e.states.contains_key(&record.state)
+            || !e
+                .fields
+                .iter()
+                .all(|(n, t)| record.fields.get(n).is_some_and(|v| valid_value(v, t)))
+        {
+            return err("TI_RECORD_INVALID", "stored record shape mismatch");
+        }
+        let actor = Actor {
+            id: "maintenance".into(),
+            roles: Set::new(),
+        };
+        let mut eval = Eval {
+            model: &self.model,
+            actor: &actor,
+            left: 100000,
+        };
+        let mut env = record.fields.clone();
+        env.insert(e.state.clone(), Value::State(record.state.clone()));
+        for state in e.states.keys() {
+            env.insert(state.clone(), Value::State(state.clone()));
+        }
+        for (_, invariant) in &e.invariants {
+            if !truth(eval.expr(invariant, &env, &Map::new())?)? {
+                return err("TI_RECORD_INVALID", "stored invariant failed");
+            }
+        }
+        Ok(())
     }
 }

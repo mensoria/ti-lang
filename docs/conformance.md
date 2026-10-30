@@ -1,6 +1,8 @@
 # Ti 0.1 conformance matrix
 
-Status: required evidence specification, not executed tests. The normative source
+Status: all 44 numbered scenarios have executable Rust regression checks.
+Observed results and exact source/backend hashes are in the
+[qualification receipt](qualification/latest.json). This matrix remains the required evidence specification; scenario coverage is not full implementation certification. The normative source
 is [the standard](ti-language-standard.md). V = validator, E = pure evaluator,
 H = host binding. IDs are stable acceptance references, not passing test results.
 
@@ -65,6 +67,7 @@ persisted outcomes. Retain failed and unknown runs. A deterministic simulator is
 useful but does not replace real transaction and response-loss qualification.
 
 Documentation review, validator tests, evaluator tests, host fault tests, CI,
-and business acceptance are separate evidence categories. The full 44-case corpus and host qualification remain unexecuted; selected Rust
-validator/evaluator checks are recorded in [implementation status](implementation.md).
+and business acceptance are separate evidence categories. The local 44-scenario run and native host fault checks are recorded in
+[implementation status](implementation.md). Full deployed-platform and exhaustive
+standard qualification remain separate.
 Prose examples are not test results.

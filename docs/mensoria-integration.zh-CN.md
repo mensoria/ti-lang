@@ -1,6 +1,6 @@
 # Mensoria 集成与职责归属
 
-状态：集成提案，并非已实现能力。[Ti 标准草案](ti-language-standard.zh-CN.md)负责语言语义。
+状态：可选原生事务宿主已实现并完成本地验证，既有 DataFacade 源码适配器已编译通过；完整平台／HTTP 验收仍独立进行。见[实现说明](implementation.zh-CN.md)。[Ti 标准草案](ti-language-standard.zh-CN.md)负责语言语义。
 
 ## 体系归属
 

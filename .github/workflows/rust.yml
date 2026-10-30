@@ -14,7 +14,20 @@ jobs:
       - name: Install Rust 1.96.0
         run: rustup toolchain install 1.96.0 --profile minimal --component rustfmt,clippy
       - run: cargo +1.96.0 fmt --check
-      - run: cargo +1.96.0 clippy --locked --all-targets -- -D warnings
+      - run: cargo +1.96.0 clippy --locked --all-targets --all-features -- -D warnings
       - run: cargo +1.96.0 test --locked
       - run: cargo +1.96.0 run --locked -- check examples/approval.ti
       - run: cargo +1.96.0 run --locked -- eval examples/approval.ti examples/create-request.json
+
+      - name: Install pinned native test backend
+        run: python3 scripts/setup_native_backend.py
+      - name: Qualify all 44 numbered scenarios
+        env:
+          TI_SURREAL_BIN: ${{ github.workspace }}/.cache/native-backend/surreal
+        run: python3 scripts/verify_conformance.py
+      - name: Retain native qualification evidence
+        if: always()
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
+        with:
+          name: ti-native-qualification
+          path: .cache/qualification/

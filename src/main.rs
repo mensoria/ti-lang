@@ -15,7 +15,9 @@ struct Request {
 fn run() -> Result<(), Box<dyn std::error::Error>> {
     let args: Vec<_> = std::env::args().collect();
     if args.len() < 3 {
-        return Err("usage: ti check|compile MODEL.ti | ti eval MODEL.ti REQUEST.json".into());
+        return Err(
+            "usage: ti check|compile|freeze MODEL.ti | ti eval MODEL.ti REQUEST.json".into(),
+        );
     }
     if fs::metadata(&args[2])?.len() > 262144 {
         return Err("TI_LIMIT: source exceeds 256 KiB".into());
@@ -25,6 +27,14 @@ fn run() -> Result<(), Box<dyn std::error::Error>> {
     match args[1].as_str() {
         "check" => println!("validated {} ({})", args[2], model.source_sha256),
         "compile" => println!("{}", serde_json::to_string_pretty(&model)?),
+        "freeze" => println!(
+            "{}",
+            serde_json::to_string_pretty(
+                ti_lang::artifact::Artifact::freeze(&source, Default::default())
+                    .map_err(|e| serde_json::to_string(&e).unwrap())?
+                    .manifest()
+            )?
+        ),
         "eval" => {
             if fs::metadata(args.get(3).ok_or("missing request")?)?.len() > 2097152 {
                 return Err("TI_LIMIT: harness request exceeds 2 MiB".into());

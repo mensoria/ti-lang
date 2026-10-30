@@ -13,3 +13,19 @@ sha2 = "0.10"
 [[bin]]
 name = "ti"
 path = "src/main.rs"
+
+[features]
+default = []
+mensoria-host = ["dep:surrealdb", "dep:tokio"]
+host-qualification = ["mensoria-host"]
+
+[dependencies.surrealdb]
+version = "=3.3.0"
+default-features = false
+features = ["protocol-http", "rustls"]
+optional = true
+
+[dependencies.tokio]
+version = "1"
+features = ["macros", "rt-multi-thread", "sync", "time"]
+optional = true

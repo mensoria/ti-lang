@@ -1,0 +1,13 @@
+BEGIN;
+LET $g=SELECT * FROM ONLY environment_guard:current;
+LET $u=SELECT * FROM ONLY type::record('user',$actor);
+LET $f=SELECT * FROM ONLY type::record('session_family',$family);
+LET $h=SELECT * FROM ONLY type::record('ti_head',$module);
+IF time::now()>=time::from_secs($expiry) OR !fn::ti_service() OR $g.state!='OPEN' OR $g.incarnation!=$inc OR $g.applied_security_seq!=$seq OR $u.active!=true OR $u.role!=$role OR ($u.session_epoch??0)!=$epoch OR $f.active!=true OR $f.generation!=$generation OR $f.expires_at<=time::now() OR !($role IN $h.roles.events) {THROW 'TI_ACCESS_DENIED';};
+LET $o=SELECT * FROM ONLY type::record('outbox',$op);
+IF $o.receipt_class!='ti_action' OR $o.module!=$module OR $o.incarnation!=$inc {THROW 'TI_ACCESS_DENIED';};
+IF $o.attempt_state!='PENDING' {THROW 'TI_REVISION_CONFLICT';};
+UPDATE environment_guard:current SET revision+=1;
+UPDATE type::record('session_family',$family) SET revision+=1;
+UPDATE type::record('outbox',$op) SET attempt_state='ATTEMPTING',attempt=$attempt,attempts=($o.attempts??0)+1;
+COMMIT;

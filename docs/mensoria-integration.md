@@ -1,6 +1,8 @@
 # Mensoria integration and ownership
 
-Status: integration proposal, not an implemented Mensoria capability.
+Status: optional native transaction host implemented and locally qualified.
+The existing DataFacade source adapter compiles; full platform/HTTP acceptance
+remains separate. See [implementation](implementation.md).
 Language authority: [Ti Standard Draft 0.1](ti-language-standard.md).
 
 ## Placement

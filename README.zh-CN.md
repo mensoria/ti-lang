@@ -11,7 +11,7 @@ Ti 的名称取意于元素符号为 Ti 的钛。它是品牌意象，不是技�
 ## 标准与阅读
 
 - [中文标准草案](docs/ti-language-standard.zh-CN.md) · [英文规范源文](docs/ti-language-standard.md)
-- [符合性矩阵](docs/conformance.zh-CN.md)：44 个待实现验证案例。
+- [符合性矩阵](docs/conformance.zh-CN.md)：44 个已有可执行检查的编号场景。
 - [Mensoria 集成边界](docs/mensoria-integration.zh-CN.md)
 - [实施阶段与验收](docs/roadmap.zh-CN.md)
 - [请假审批源码](examples/approval.ti)
@@ -20,7 +20,7 @@ Ti 的名称取意于元素符号为 Ti 的钛。它是品牌意象，不是技�
 
 ## 当前状态
 
-草案 0.1，语言版次 ti/0.1。已有 Rust 参考解析器、语义校验器与纯动作求值器；数据库宿主和完整符合性验证尚未实现。
+草案 0.1，语言版次 ti/0.1。已有 Rust 编译器、求值器、严格 wire 编解码、冻结制品和可选 Mensoria 事务宿主。44 个编号回归场景均可执行；验证范围见[实现说明](docs/implementation.zh-CN.md)，尚不声明完整标准或生产符合性。
 
 第一版聚焦单对象、单级审批。受管对象的公开写入只走动作，包含创建和草稿编辑。通用函数、任意 SQL、循环、外部 I/O、多对象动作和长流程编排不在首版范围。
 
@@ -43,4 +43,11 @@ cargo run --locked -- check examples/approval.ti
 cargo run --locked -- eval examples/approval.ti examples/create-request.json
 ```
 
-能力与待完成边界见[实现说明](docs/implementation.md)。求值只返回候选记录与事件，不认证身份，也不向 Mensoria DB 提交。
+独立 `eval` 只返回候选结果；真实事务使用可选宿主。执行全部编号场景：
+
+```sh
+python3 scripts/setup_native_backend.py
+TI_SURREAL_BIN="$PWD/.cache/native-backend/surreal" python3 scripts/verify_conformance.py
+```
+
+接入和边界见[实现说明](docs/implementation.zh-CN.md)。

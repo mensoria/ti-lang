@@ -1,6 +1,10 @@
 //! Ti 0.1 compiler and pure evaluator. No database authority is granted here.
+pub mod artifact;
 mod evaluator;
+#[cfg(feature = "mensoria-host")]
+pub mod mensoria;
 mod parser;
+pub mod wire;
 pub use evaluator::{Actor, Candidate, Event, Record};
 use serde::{Deserialize, Serialize};
 use sha2::{Digest, Sha256};
@@ -165,7 +169,7 @@ impl Model {
                 Ok("Bool".into())
             }
             Expr::Binary(op, a, b) => {
-                let bare_state = |x: &Expr| matches!(x, Expr::Ref(n) if !n.contains('.') && env.get(n).is_some_and(|t| t.starts_with("state:")) && !self.entities.values().any(|e| e.state == *n));
+                let bare_state = |x: &Expr| matches!(x, Expr::Ref(n) if !n.contains('.') && env.get(n).is_some_and(|t| t.starts_with("state:")) && env.get("#state-field").is_none_or(|field| field != n));
                 if bare_state(a) && bare_state(b) {
                     return err("TI_TYPE", "state comparison requires a typed state field");
                 }
@@ -470,6 +474,7 @@ impl Model {
     fn invariant_env(&self, n: &str) -> Result<Map<String, String>> {
         let e = &self.entities[n];
         let mut env = e.fields.clone();
+        env.insert("#state-field".into(), e.state.clone());
         env.insert(e.state.clone(), format!("state:{n}"));
         for s in e.states.keys() {
             env.insert(s.clone(), format!("state:{n}"));
@@ -494,4 +499,18 @@ pub fn compile(source: &str) -> Result<Compiled> {
         edition: "ti/0.1",
         profile: "approval-core/0.1",
     })
+}
+
+/// Decode source bytes without accepting invalid UTF-8 or a BOM.
+pub fn compile_bytes(bytes: &[u8]) -> Result<Compiled> {
+    if bytes.len() > 262144 {
+        return err("TI_LIMIT", "source exceeds 256 KiB");
+    }
+    let source = std::str::from_utf8(bytes).map_err(|_| Diagnostic {
+        code: "TI_SYNTAX".into(),
+        message: "source is not valid UTF-8".into(),
+        line: 1,
+        column: 1,
+    })?;
+    compile(source)
 }

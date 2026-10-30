@@ -1,0 +1,12 @@
+{
+  "source": "mensoria/prototypes/surrealdb-rust-ai-baas/migrations",
+  "source_revision": "uncommitted local baseline inspected 2026-10-30",
+  "server": "3.3.0",
+  "sha256": {
+    "001-p0.surql": "5b0b2db1d99733372a6fdf1509f01e350fe8911c817013fc0ce38b06f6927b98",
+    "003-command-bridge.surql": "e146c73205e6369ec73fc1ed860b00ad6b1114eba1160015070cc73f534561bc",
+    "004-data.surql": "66b42e05b63ecfbfdced304513a32cd4fa05265494e65682fd6f66a02b203d10",
+    "005-data-concurrency.surql": "6ce1414e1a3c0b71a7cb01f455ac305535d1672a00f707273621728033c028f5",
+    "006-auth-lifecycle.surql": "5f5a7e4c2e299749d401a3bb5c0d93ded776bc93e54c646f28a0cabdb196ff0f"
+  }
+}
