@@ -1,0 +1,37 @@
+{
+  "schema": "ti.lock/1",
+  "root_package": {
+    "name": "acme.leave",
+    "version": "0.1.0",
+    "content_sha256": "66bbd66c6a629578634a743e2551b4b639cd6bddfcc716b76e283a6a7aabe52a"
+  },
+  "packages": [
+    {
+      "name": "acme.approval_events",
+      "version": "1.2.0",
+      "edition": "ti/0.2",
+      "profile": "approval-package/0.2",
+      "root": "approval_events",
+      "kind": "library",
+      "content_sha256": "d4d5834f6f06cb37dd0a9c86788fef8aaf474dd02091216bd8b50a54d2938de2",
+      "dependencies": {}
+    },
+    {
+      "name": "acme.leave",
+      "version": "0.1.0",
+      "edition": "ti/0.2",
+      "profile": "approval-package/0.2",
+      "root": "leave",
+      "kind": "model",
+      "content_sha256": "66bbd66c6a629578634a743e2551b4b639cd6bddfcc716b76e283a6a7aabe52a",
+      "dependencies": {
+        "approval_events": {
+          "name": "acme.approval_events",
+          "version": "1.2.0",
+          "content_sha256": "d4d5834f6f06cb37dd0a9c86788fef8aaf474dd02091216bd8b50a54d2938de2"
+        }
+      }
+    }
+  ],
+  "graph_sha256": "efe2949979a688ff930c8c887cc243f093f21f0831fee6fd7cdc1d8ce76de476"
+}

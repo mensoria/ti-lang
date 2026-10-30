@@ -44,8 +44,12 @@ action Approve on LeaveRequest {
 | 平台接入 | [Mensoria 集成](integration.md) · [模型演进](10-evolution.md) |
 | 实现验证 | [符合性矩阵](conformance.md) · [交付阶段](roadmap.md) |
 
+## 项目与编译器设计
+
+[包提案](project-and-packages.md)定义项目、模块、导入、可见性和锁定构建。[编译器分层](compiler-architecture.md)、[交付门槛](implementation-plan.md)及[包验收](package-conformance.md)区分已实施的工程组织与下一版语言语法设计。
+
 ## 文档状态
 
-本书为标准草案，已有 Rust 参考校验器和纯求值器，数据库宿主尚未接入。首版聚焦单对象、单级审批；文档发布不代表运行时符合性已通过验证。
+本书为标准草案，已有 Rust 编译／求值实现及可选 Mensoria 原生事务宿主；项目加载／导入和离线求值已可用，下一版激活仍为提案。首版聚焦单对象、单级审批；文档发布不代表运行时符合性已通过验证。
 
 英文为规范源文，中文版使用相同条款编号与语法。两种版本共用一套模型，按对应章节阅读。

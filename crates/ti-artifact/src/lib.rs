@@ -1,6 +1,9 @@
 //! Immutable model artifacts. Publication/activation persistence belongs to the host.
-use crate::*;
+use serde::Serialize;
+use sha2::{Digest, Sha256};
+use std::collections::BTreeMap as Map;
 use std::sync::Arc;
+use ti_language::{compile, Compiled, Diagnostic, Result};
 #[derive(Debug, Clone, Serialize)]
 pub struct Manifest {
     pub edition: String,
@@ -31,28 +34,20 @@ impl Artifact {
         }
         let mut compiler = Sha256::new();
         compiler.update(b"ti.compiler/0.1\0");
-        for source in [
-            include_str!("lib.rs"),
-            include_str!("parser.rs"),
-            include_str!("evaluator.rs"),
-            include_str!("wire.rs"),
-            include_str!("artifact.rs"),
-            include_str!("../Cargo.lock"),
-        ] {
+        for source in ti_language::implementation_sources()
+            .iter()
+            .copied()
+            .chain([include_str!("lib.rs"), include_str!("../../../Cargo.lock")])
+        {
             compiler.update((source.len() as u64).to_be_bytes());
             compiler.update(source.as_bytes());
         }
-        let ir = serde_json::to_vec(&compiled.model).map_err(|_| Diagnostic {
-            code: "TI_MODEL".into(),
-            message: "IR serialization failed".into(),
-            line: 0,
-            column: 0,
-        })?;
+        let ir = compiled.ir_bytes()?;
         let manifest = Manifest {
             edition: compiled.edition.into(),
             profile: compiled.profile.into(),
-            module: compiled.model.module.clone(),
-            version: compiled.model.version,
+            module: compiled.module_name().into(),
+            version: compiled.model_version(),
             source_sha256: compiled.source_sha256.clone(),
             ir_sha256: format!("{:x}", Sha256::digest(&ir)),
             compiler_fingerprint: format!("{:x}", compiler.finalize()),
@@ -130,4 +125,13 @@ impl Registry {
     pub fn get(&self, module: &str, version: i64) -> Option<&Artifact> {
         self.artifacts.get(&(module.into(), version))
     }
+}
+
+fn err<T>(code: &str, message: &str) -> Result<T> {
+    Err(Diagnostic {
+        code: code.into(),
+        message: message.into(),
+        line: 0,
+        column: 0,
+    })
 }

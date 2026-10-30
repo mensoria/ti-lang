@@ -18,8 +18,9 @@ report = {'schema': 'ti.qualification/1', 'time_utc': STAMP,
           'claim': '44 numbered regression scenarios, not full implementation or platform certification',
           'platform': platform.platform(), 'rust': subprocess.check_output(['rustc','--version'], text=True).strip(),
           'backend': 'SurrealDB 3.3.0; isolated loopback memory database per native test',
-          'source_sha256': {}, 'runs': [], 'cases': []}
-paths = sorted(set(ROOT.glob('src/*')) | set(ROOT.glob('tests/*.rs')) | set(ROOT.glob('tests/support/*.rs')) | {ROOT/'Cargo.lock', ROOT/'Cargo.toml'})
+          'source_sha256': {}, 'runs': [], 'cases': [],
+          'package_evidence': 'Separate project regressions in projects-latest.json; full PC and 0.2 host qualification are not claimed'}
+paths = sorted(set(ROOT.glob('src/*')) | set(ROOT.glob('tests/*.rs')) | set(ROOT.glob('tests/support/*.rs')) | set(ROOT.glob('crates/*/src/*')) | set(ROOT.glob('crates/*/Cargo.toml')) | {ROOT/'Cargo.lock', ROOT/'Cargo.toml'})
 for path in paths:
     if path.is_file(): report['source_sha256'][str(path.relative_to(ROOT))] = hashlib.sha256(path.read_bytes()).hexdigest()
 report['fixture'] = json.loads((ROOT/'tests/fixtures/mensoria/manifest.json').read_text())

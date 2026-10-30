@@ -28,7 +28,11 @@ def chapters(lang):
     for slug, content in zip(SLUGS, sections[1:]):
         pages[slug + '.md'] = re.sub(r'^## ', '# ', content, count=1)
     for slug, source in [('overview', 'language'), ('conformance', 'conformance'),
-                         ('integration', 'mensoria-integration'), ('roadmap', 'roadmap')]:
+                         ('integration', 'mensoria-integration'), ('roadmap', 'roadmap'),
+                         ('project-and-packages','project-and-packages'),
+                         ('compiler-architecture','compiler-architecture'),
+                         ('implementation-plan','implementation-plan'),
+                         ('package-conformance','package-conformance')]:
         pages[slug + '.md'] = read(source, lang)
     example = (ROOT / 'examples/approval.ti').read_text()
     if lang == 'zh-CN':
@@ -44,14 +48,20 @@ def chapters(lang):
         '审批人不能批准自己的申请。并发批准与撤回竞争同一记录版本。赋值读旧记录，事件读候选记录。响应丢失后核对原操作。\n')
     # Rewrite manuscript links to generated book chapters, preserving one authority.
     for filename, content in list(pages.items()):
-        content = re.sub(r'\*\*(TI-\d{3})\.\*\*', lambda m: f'<a id="{m[1].lower()}"></a>\n\n{m[0]}', content)
-        content = re.sub(r'^(\| )(TC-\d{3})( \|)', lambda m: f'{m[1]}<a id="{m[2].lower()}"></a>{m[2]}{m[3]}', content, flags=re.M)
+        content = re.sub(r'\*\*((?:TI|PKG|ARC|MIG)-\d{3})\.\*\*', lambda m: f'<a id="{m[1].lower()}"></a>\n\n{m[0]}', content)
+        content = re.sub(r'^(\| )((?:TC|PC)-\d{3})( \|)', lambda m: f'{m[1]}<a id="{m[2].lower()}"></a>{m[2]}{m[3]}', content, flags=re.M)
         for stem, dest in [(STANDARD, 'index'), ('language', 'overview'), ('conformance', 'conformance'),
-                           ('mensoria-integration', 'integration'), ('roadmap', 'roadmap')]:
+                           ('mensoria-integration', 'integration'), ('roadmap', 'roadmap'),
+                           ('project-and-packages','project-and-packages'),
+                           ('compiler-architecture','compiler-architecture'),
+                           ('implementation-plan','implementation-plan'),
+                           ('package-conformance','package-conformance')]:
             content = content.replace(f']({stem}.zh-CN.md)', f']({dest}.md)')
             content = content.replace(f']({stem}.md)', f']({dest}.md)')
+        content = content.replace('](../examples/package-design/README.md)', '](https://github.com/mensoria/ti-lang/tree/main/examples/package-design)')
         content = content.replace('](../examples/approval.ti)', '](approval.md)')
         content = content.replace('](implementation.zh-CN.md)', '](https://github.com/mensoria/ti-lang/blob/main/docs/implementation.zh-CN.md)')
+        content = content.replace('](qualification/projects-latest.json)', '](https://github.com/mensoria/ti-lang/blob/main/docs/qualification/projects-latest.json)')
         content = content.replace('](qualification/latest.json)', '](https://github.com/mensoria/ti-lang/blob/main/docs/qualification/latest.json)')
         content = content.replace('](implementation.md)', '](https://github.com/mensoria/ti-lang/blob/main/docs/implementation.md)')
         # Chinese source's English authority link must go to the English book.
@@ -78,6 +88,8 @@ def generate(lang):
         (None, ['index.md']),
         ('Getting started' if lang == 'en' else '入门', ['overview.md', 'approval.md']),
         ('Language standard' if lang == 'en' else '语言规范', [x + '.md' for x in SLUGS[:12]]),
+        ('Projects and compiler design (proposal)' if lang == 'en' else '项目与编译器设计（提案）',
+         ['project-and-packages.md','compiler-architecture.md','implementation-plan.md','package-conformance.md']),
         ('Reference and integration' if lang == 'en' else '参考与集成',
          [x + '.md' for x in SLUGS[12:]] + ['conformance.md', 'integration.md', 'roadmap.md']),
     ]

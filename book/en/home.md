@@ -49,9 +49,18 @@ business state, operation result, audit, and outbox atomically. See
 | Platform integration | [Mensoria binding](integration.md) · [Model evolution](10-evolution.md) |
 | Implementation evidence | [Conformance matrix](conformance.md) · [Delivery stages](roadmap.md) |
 
+## Projects and compiler design
+
+The [package proposal](project-and-packages.md) defines projects, modules, imports,
+visibility and locked builds. [Compiler layering](compiler-architecture.md),
+[delivery gates](implementation-plan.md) and [package acceptance](package-conformance.md)
+distinguish implemented workspace organization from proposed next-edition syntax.
+
 ## Document status
 
-This is a proposed standard, with an initial Rust validator and pure evaluator, and no database host yet. The first profile
+This is a proposed standard with a Rust compiler/evaluator and an optional native
+Mensoria transaction host. Project loading/imports and offline evaluation are available; next-edition
+activation remains a proposal. The first profile
 covers single-object, single-stage approval. Publication does not establish runtime
 conformance.
 

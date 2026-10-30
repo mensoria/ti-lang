@@ -31,7 +31,7 @@ across every public write path. It is not to replace Rust, SQL, or the database.
 ## Design
 
 - [Ti Language Standard — Draft 0.1](docs/ti-language-standard.md): normative syntax and semantics
-- [Conformance matrix](docs/conformance.md): required evidence, not executed tests
+- [Conformance matrix](docs/conformance.md): required evidence with numbered baseline regression checks
 - [Core model and minimum language](docs/language.md)
 - [Mensoria integration and ownership](docs/mensoria-integration.md)
 - [Delivery stages and acceptance](docs/roadmap.md)
@@ -50,12 +50,11 @@ General-purpose functions, arbitrary SQL, network or filesystem access, loops,
 user-supplied executable code, multi-object actions, timers, and long-running
 workflow orchestration are outside the first version.
 
-Implementation licensing has not been selected. No upstream Rip code has been
-copied into this repository.
+Implementation licensing has not been selected.
 
 ## Bilingual book and publication
 
-The online book provides 21 chapters per edition, complete English and Simplified
+The online book provides 25 chapters per edition, complete English and Simplified
 Chinese manuscripts, chapter-aligned language switching, and search.
 The English standard is normative; translated clauses retain the same identifiers.
 
@@ -79,3 +78,12 @@ cargo run --locked -- eval examples/approval.ti examples/create-request.json
 
 See [implementation and limits](docs/implementation.md). Evaluation returns a
 candidate and events only; it does not authenticate or commit to Mensoria DB.
+
+## Project and compiler design
+
+Read the [package/module proposal](docs/project-and-packages.md),
+[compiler architecture](docs/compiler-architecture.md),
+[delivery plan](docs/implementation-plan.md) and
+[package acceptance](docs/package-conformance.md). The implementation has six
+workspace packages. Project loading, explicit locking, `use`/`pub use` and offline
+evaluation are implemented; next-edition deployment remains separate.

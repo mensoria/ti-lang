@@ -1,0 +1,2 @@
+module approval_events;
+pub use approval_events.events::{DecisionRecorded};

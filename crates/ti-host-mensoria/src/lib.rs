@@ -1,11 +1,12 @@
 //! Mensoria environment-DB transaction host. Runtime connections are record-bound
 //! actor and environment-scoped data_issuer sessions; never root credentials.
-use crate::{artifact::Artifact, wire, Actor, Candidate, Diagnostic, Record, Result, Value};
 use serde::{Deserialize, Serialize};
 use serde_json::{json, Value as Json};
 use sha2::{Digest, Sha256};
 use std::collections::{BTreeMap, BTreeSet};
 use surrealdb::{engine::remote::http::Client, Surreal};
+use ti_artifact::Artifact;
+use ti_language::{wire, Actor, Candidate, Diagnostic, Record, Result, Value};
 
 fn failure(code: &str) -> Diagnostic {
     Diagnostic {
@@ -22,11 +23,11 @@ fn hash(bytes: &[u8]) -> String {
 pub fn implementation_fingerprint() -> String {
     let mut bytes = vec![];
     for source in [
-        include_str!("mensoria.rs"),
+        include_str!("lib.rs"),
         include_str!("mensoria_transaction.surql"),
         include_str!("mensoria_delivery.surql"),
         include_str!("mensoria_delivery_finish.surql"),
-        include_str!("../Cargo.lock"),
+        include_str!("../../../Cargo.lock"),
     ] {
         bytes.extend(wire::frame(b'h', source.as_bytes()).expect("bounded host source"));
     }
@@ -92,7 +93,7 @@ pub struct Command {
 }
 impl Command {
     pub fn decode(bytes: &[u8]) -> Result<Self> {
-        let mut json = wire::strict_json_bounded(bytes, 135168)?;
+        let mut json = wire::decode_command_json(bytes)?;
         let inputs = wire::decode_inputs(
             &serde_json::to_vec(&json["inputs"]).map_err(|_| failure("TI_INPUT"))?,
         )?;

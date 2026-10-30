@@ -1,0 +1,335 @@
+{
+  "schema": "ti.project-qualification/1",
+  "time_utc": "20261030T080821.961160Z",
+  "edition": "ti/0.2",
+  "status": "passed",
+  "tests": 28,
+  "claim": "Implemented project regression checks, not full PC acceptance or 0.2 host qualification",
+  "command": [
+    "cargo",
+    "test",
+    "--locked",
+    "--test",
+    "projects"
+  ],
+  "exit_code": 0,
+  "source_sha256": {
+    "Cargo.lock": "0b4089e923a8c12cd3edc644ee064f223c10467a5928cc43ad693f3d674d88de",
+    "Cargo.toml": "4f22e1a6400eac0baf8caeb8b964a1b4876a7e601b83152faf7b997292e566d3",
+    "crates/ti-artifact/Cargo.toml": "18d7c4d2ade181ad7cf5f0b390bfd8b0c8ac6841dfed9eb52608bffb72ae93e3",
+    "crates/ti-artifact/src/lib.rs": "147cc105da21cbf622d57d14c27524739848c2ba2f12cf91b05c1cb4330315fc",
+    "crates/ti-cli/Cargo.toml": "f3d8d313a3fb2b8d2609271fc88e8eb0841078e63167eae7118727e8db8c12a8",
+    "crates/ti-cli/src/lib.rs": "9b05808044631caeea4346682971027300650244a8dd926bdd950d694d9d65b5",
+    "crates/ti-host-mensoria/Cargo.toml": "638844b775ba691e33218bef5416fc88e9c503489269368b971a7c5a3abc054d",
+    "crates/ti-host-mensoria/src/lib.rs": "d3acf812209e3787c8a4f49689762326f3b7ac24425b04ff11c9b58b7b3c53fe",
+    "crates/ti-host-mensoria/src/mensoria_delivery.surql": "c48d148e089ce2e9e436471d3c0e1cab643e74bc9be37806725780b9b02b921b",
+    "crates/ti-host-mensoria/src/mensoria_delivery_finish.surql": "eb5cb64be71445ad185649d47131b8946fbaf60cb279d0ca2805ecbae8572668",
+    "crates/ti-host-mensoria/src/mensoria_transaction.surql": "339ca3e1f025aa96521b2d1e4c88730aa0a1e2504e6abf2534e0c10bfd0b659b",
+    "crates/ti-language/Cargo.toml": "489fedc71f28034f5c3b63a5b3fe1fa18a8b37b1e1715edb0c0deeec71f0a343",
+    "crates/ti-language/src/check.rs": "0b389007527567dd0b3c4a50e6f28f3cc5f972d95aff6fd2b6a712c5a21cfebe",
+    "crates/ti-language/src/evaluator.rs": "15c41b7f89b8771678ac5ce722cfb00640871a732c9ed48aab29d15da25a1519",
+    "crates/ti-language/src/lib.rs": "96b7328c36baa4ed420ebd96703d9323e23a7d61b09d7910ce321338c338ef24",
+    "crates/ti-language/src/model.rs": "91a847d5fb05a86248a5ba982ca5712107d01901f09b955024b130e28bb58c97",
+    "crates/ti-language/src/project.rs": "23670993151d3b02c86e44c2b1891f96dceec3efb9b8ef39b8d9c40e01a4ffbd",
+    "crates/ti-language/src/syntax.rs": "ffbdc36ece9e7892b429b77680937a258fc60a7c13acd0ff36c38ab86696ad79",
+    "crates/ti-language/src/wire.rs": "cd461618cba3c6ff6b962288cdaa076333b3e4c4e07f0f38ba3c891084dfcf73",
+    "crates/ti-project/Cargo.toml": "1a4eeacafb49b341dae61aca21be79e390dffd5ac3c58651c2e1b88c883ead22",
+    "crates/ti-project/src/io.rs": "39809f2c199caddc85c9c81a1b9040f107215534b9c27b09fba6e24d0bb03999",
+    "crates/ti-project/src/lib.rs": "f960cd46f35900291026c9e448effae0fe52e153b6491755f34d10db9c940b5d",
+    "tests/projects.rs": "8ab4e72cd8dc043e3edbc8500aadb12f4ce365cccc51ae1d30c831f3a8a3abb3"
+  },
+  "cases": [
+    {
+      "id": "PC-001",
+      "status": "regression-covered",
+      "checks": [
+        {
+          "test": "pc_001_005_multifile_approval",
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "id": "PC-002",
+      "status": "regression-covered",
+      "checks": [
+        {
+          "test": "pc_002_manifest_unknown_duplicate_and_hooks",
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "id": "PC-003",
+      "status": "regression-covered",
+      "checks": [
+        {
+          "test": "pc_003_exact_dependency_identity_even_cached",
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "id": "PC-004",
+      "status": "regression-covered",
+      "checks": [
+        {
+          "test": "pc_004_release_and_model_revision_are_independent",
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "id": "PC-005",
+      "status": "regression-covered",
+      "checks": [
+        {
+          "test": "pc_001_005_multifile_approval",
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "id": "PC-006",
+      "status": "regression-covered",
+      "checks": [
+        {
+          "test": "pc_006_path_header_and_portable_names",
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "id": "PC-007",
+      "status": "regression-covered",
+      "checks": [
+        {
+          "test": "pc_007_016_workspace_roots_are_explicit",
+          "status": "ok"
+        },
+        {
+          "test": "pc_007_symlink_and_special_file_rejection",
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "id": "PC-008",
+      "status": "regression-covered",
+      "checks": [
+        {
+          "test": "pc_008_unused_module_is_checked",
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "id": "PC-009",
+      "status": "regression-covered",
+      "checks": [
+        {
+          "test": "pc_009_alias_and_reexport_preserve_identity",
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "id": "PC-010",
+      "status": "regression-covered",
+      "checks": [
+        {
+          "test": "pc_010_private_import_and_reexport",
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "id": "PC-011",
+      "status": "regression-covered",
+      "checks": [
+        {
+          "test": "pc_011_alias_shadowing",
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "id": "PC-012",
+      "status": "regression-covered",
+      "checks": [
+        {
+          "test": "pc_012_public_type_closure",
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "id": "PC-013",
+      "status": "regression-covered",
+      "checks": [
+        {
+          "test": "pc_013_missing_and_duplicate_creation",
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "id": "PC-014",
+      "status": "regression-covered",
+      "checks": [
+        {
+          "test": "pc_014_foreign_entity_extension",
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "id": "PC-015",
+      "status": "regression-covered",
+      "checks": [
+        {
+          "test": "pc_015_foreign_root_activation_denied",
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "id": "PC-016",
+      "status": "regression-covered",
+      "checks": [
+        {
+          "test": "pc_007_016_workspace_roots_are_explicit",
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "id": "PC-017",
+      "status": "regression-covered",
+      "checks": [
+        {
+          "test": "pc_017_missing_stale_and_transitive_source_locks",
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "id": "PC-018",
+      "status": "regression-covered",
+      "checks": [
+        {
+          "test": "pc_018_lock_duplicate_unknown_and_digest",
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "id": "PC-019",
+      "status": "regression-covered",
+      "checks": [
+        {
+          "test": "pc_019_module_and_package_cycles",
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "id": "PC-020",
+      "status": "regression-covered",
+      "checks": [
+        {
+          "test": "pc_020_checkout_location_does_not_change_identity",
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "id": "PC-021",
+      "status": "regression-covered",
+      "checks": [
+        {
+          "test": "pc_021_alias_changes_build_identity",
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "id": "PC-022",
+      "status": "not-executed",
+      "checks": []
+    },
+    {
+      "id": "PC-023",
+      "status": "regression-covered",
+      "checks": [
+        {
+          "test": "pc_023_same_short_names_are_distinct",
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "id": "PC-024",
+      "status": "regression-covered",
+      "checks": [
+        {
+          "test": "pc_024_policy_entity_argument_is_nominal",
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "id": "PC-025",
+      "status": "regression-covered",
+      "checks": [
+        {
+          "test": "pc_025_source_and_manifest_limits",
+          "status": "ok"
+        },
+        {
+          "test": "pc_025_dependency_depth_including_cached_subgraphs",
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "id": "PC-026",
+      "status": "regression-covered",
+      "checks": [
+        {
+          "test": "pc_026_declaration_order_keeps_linked_model_order",
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "id": "PC-027",
+      "status": "regression-covered",
+      "checks": [
+        {
+          "test": "pc_027_lock_symlink_never_overwrites_target",
+          "status": "ok"
+        },
+        {
+          "test": "pc_027_failed_relock_preserves_original",
+          "status": "ok"
+        }
+      ]
+    },
+    {
+      "id": "PC-028",
+      "status": "not-executed",
+      "checks": []
+    },
+    {
+      "id": "PC-029",
+      "status": "not-executed",
+      "checks": []
+    },
+    {
+      "id": "PC-030",
+      "status": "not-executed",
+      "checks": []
+    }
+  ]
+}

@@ -1,6 +1,8 @@
 # Delivery stages and acceptance
 
-Status: proposed sequence. An initial Rust validator and pure-evaluator slice exists; full conformance and host integration remain pending.
+Status: baseline compiler/evaluator/native host regression checks exist; full
+platform and standard qualification remain separate. The implementation workspace
+is being organized without changing the baseline language.
 The [standard draft](ti-language-standard.md) specifies the baseline;
 [conformance cases](conformance.md) define required implementation evidence.
 
@@ -66,3 +68,10 @@ codecs. Each requires a separate semantic and failure contract.
 Report documentation review, local tests, backend fault checks, CI, and business
 acceptance separately. Synthetic and pure-evaluation tests do not establish
 transaction, recovery, revocation, or production readiness.
+
+## Project and module work
+
+The [project/package standard](project-and-packages.md) defines the next edition.
+Follow the [compiler design](compiler-architecture.md) and [delivery gates](implementation-plan.md),
+with separate [30-case package acceptance](package-conformance.md). Existing
+TC results do not qualify new project syntax or activation.

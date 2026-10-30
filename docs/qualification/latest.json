@@ -1,26 +1,39 @@
 {
   "schema": "ti.qualification/1",
-  "time_utc": "20261030T042932.381710Z",
+  "time_utc": "20261030T080824.983718Z",
   "claim": "44 numbered regression scenarios, not full implementation or platform certification",
   "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
   "rust": "rustc 1.96.0 (ac68faa20 2026-05-25) (Homebrew)",
   "backend": "SurrealDB 3.3.0; isolated loopback memory database per native test",
   "source_sha256": {
-    "Cargo.lock": "bc0096e2799bad48a053d34bf70619c895469eb4593865a8d3a9060462b1898e",
-    "Cargo.toml": "95fc328e351c535ee4872422f59d82252772ef838bdf6812d6209203bcca9320",
-    "src/artifact.rs": "8ef6f45cc02eaed913cc1aa6a87161a449d1eb75e75724c0be08d1b05910bb01",
-    "src/evaluator.rs": "15c41b7f89b8771678ac5ce722cfb00640871a732c9ed48aab29d15da25a1519",
-    "src/lib.rs": "83d5d94ecafcc800a298746538e8f46cad9d12348b02e057626782988e29d4c3",
-    "src/main.rs": "bba7cc3fbecff40a591db8726144b77c0018990978e2e973d82778e0402b88a9",
-    "src/mensoria.rs": "bc2b7de693c857e6bc73d953be1eea132f49c33118924880da57502968c02c06",
-    "src/mensoria_delivery.surql": "c48d148e089ce2e9e436471d3c0e1cab643e74bc9be37806725780b9b02b921b",
-    "src/mensoria_delivery_finish.surql": "eb5cb64be71445ad185649d47131b8946fbaf60cb279d0ca2805ecbae8572668",
-    "src/mensoria_transaction.surql": "339ca3e1f025aa96521b2d1e4c88730aa0a1e2504e6abf2534e0c10bfd0b659b",
-    "src/parser.rs": "71e84fbfbc664590ab988e3a426807048f5abe28b23efba05cc6745ff6e6f62f",
-    "src/wire.rs": "5516a39584da719cc3a56ab22681d38f580d430f2924b0fef32ac2d38b75407b",
+    "Cargo.lock": "0b4089e923a8c12cd3edc644ee064f223c10467a5928cc43ad693f3d674d88de",
+    "Cargo.toml": "4f22e1a6400eac0baf8caeb8b964a1b4876a7e601b83152faf7b997292e566d3",
+    "crates/ti-artifact/Cargo.toml": "18d7c4d2ade181ad7cf5f0b390bfd8b0c8ac6841dfed9eb52608bffb72ae93e3",
+    "crates/ti-artifact/src/lib.rs": "147cc105da21cbf622d57d14c27524739848c2ba2f12cf91b05c1cb4330315fc",
+    "crates/ti-cli/Cargo.toml": "f3d8d313a3fb2b8d2609271fc88e8eb0841078e63167eae7118727e8db8c12a8",
+    "crates/ti-cli/src/lib.rs": "9b05808044631caeea4346682971027300650244a8dd926bdd950d694d9d65b5",
+    "crates/ti-host-mensoria/Cargo.toml": "638844b775ba691e33218bef5416fc88e9c503489269368b971a7c5a3abc054d",
+    "crates/ti-host-mensoria/src/lib.rs": "d3acf812209e3787c8a4f49689762326f3b7ac24425b04ff11c9b58b7b3c53fe",
+    "crates/ti-host-mensoria/src/mensoria_delivery.surql": "c48d148e089ce2e9e436471d3c0e1cab643e74bc9be37806725780b9b02b921b",
+    "crates/ti-host-mensoria/src/mensoria_delivery_finish.surql": "eb5cb64be71445ad185649d47131b8946fbaf60cb279d0ca2805ecbae8572668",
+    "crates/ti-host-mensoria/src/mensoria_transaction.surql": "339ca3e1f025aa96521b2d1e4c88730aa0a1e2504e6abf2534e0c10bfd0b659b",
+    "crates/ti-language/Cargo.toml": "489fedc71f28034f5c3b63a5b3fe1fa18a8b37b1e1715edb0c0deeec71f0a343",
+    "crates/ti-language/src/check.rs": "0b389007527567dd0b3c4a50e6f28f3cc5f972d95aff6fd2b6a712c5a21cfebe",
+    "crates/ti-language/src/evaluator.rs": "15c41b7f89b8771678ac5ce722cfb00640871a732c9ed48aab29d15da25a1519",
+    "crates/ti-language/src/lib.rs": "96b7328c36baa4ed420ebd96703d9323e23a7d61b09d7910ce321338c338ef24",
+    "crates/ti-language/src/model.rs": "91a847d5fb05a86248a5ba982ca5712107d01901f09b955024b130e28bb58c97",
+    "crates/ti-language/src/project.rs": "23670993151d3b02c86e44c2b1891f96dceec3efb9b8ef39b8d9c40e01a4ffbd",
+    "crates/ti-language/src/syntax.rs": "ffbdc36ece9e7892b429b77680937a258fc60a7c13acd0ff36c38ab86696ad79",
+    "crates/ti-language/src/wire.rs": "cd461618cba3c6ff6b962288cdaa076333b3e4c4e07f0f38ba3c891084dfcf73",
+    "crates/ti-project/Cargo.toml": "1a4eeacafb49b341dae61aca21be79e390dffd5ac3c58651c2e1b88c883ead22",
+    "crates/ti-project/src/io.rs": "39809f2c199caddc85c9c81a1b9040f107215534b9c27b09fba6e24d0bb03999",
+    "crates/ti-project/src/lib.rs": "f960cd46f35900291026c9e448effae0fe52e153b6491755f34d10db9c940b5d",
+    "src/lib.rs": "860bceebc05085f1c26f125d60e301adf3bbb4a1982f7c11312328a8d786c605",
+    "src/main.rs": "10c1042c49adb3ffe0d20115c9f5e4d1d2a4bd50a903972a653f89e98ab40c39",
     "tests/conformance.rs": "ae943e0f5371c2a996ade696cd9d596abd5fde226186ed36a34c09c01d354637",
     "tests/language.rs": "0408b3ba9e7b6b3c49b86ee00c43dada1c2247d36515fda5a542d7e30237096f",
     "tests/native_host.rs": "6f5f3ef768d3322564ff929fdfe0b4fbb248c998044c3ce6ee2259225544c92b",
+    "tests/projects.rs": "8ab4e72cd8dc043e3edbc8500aadb12f4ce365cccc51ae1d30c831f3a8a3abb3",
     "tests/support/mod.rs": "d3940816aef511b1e23534700c4836e538008d3262bde559881794288628db81",
     "tests/support/proxy.rs": "753b39640bdece62a64ecf536705fbad1646168c00f41304e5acdb6cc7adc002"
   },
@@ -37,7 +50,7 @@
         "conformance"
       ],
       "exit_code": 0,
-      "log_sha256": "31b52754bb336d18549c96f57a54347f0bd09d9706b8e5d715cc65dc8edd2aa1"
+      "log_sha256": "655173fd5a8159e6eb6832692bba784869672cdf321e3ffb803eb2d6ce708e6b"
     },
     {
       "suite": "native",
@@ -53,7 +66,7 @@
         "--test-threads=2"
       ],
       "exit_code": 0,
-      "log_sha256": "dc2f4452489b0676fdd31dd1064b92864a790e36d411793f0c3e3e5703947cb9"
+      "log_sha256": "15e8329f659d28d642159746b6115adad8d019bbf9b85f5eed40eeeb6f4bd648"
     }
   ],
   "cases": [
@@ -386,6 +399,7 @@
       ]
     }
   ],
+  "package_evidence": "Separate project regressions in projects-latest.json; full PC and 0.2 host qualification are not claimed",
   "fixture": {
     "source": "mensoria/prototypes/surrealdb-rust-ai-baas/migrations",
     "source_revision": "uncommitted local baseline inspected 2026-10-30",
@@ -415,9 +429,9 @@
     "runtime_end_to_end": "not executed",
     "source_revision": "uncommitted local baseline",
     "sha256": {
-      "Cargo.lock": "cc8120bdfc6e449be642e2f34c9d0dc03e01f6c2c4dc67c95750057b79e2852e",
+      "Cargo.lock": "d39592e4a82493d47e18483392358db574784b29e6abd69ad1cfe90f80693d0f",
       "crates/baas-adapters/Cargo.toml": "c543b3cf6d50c8d678c5f60d5a655a4245d7635b0e46e4dd9074c0ba0eb2ff05",
-      "crates/baas-adapters/src/data.rs": "84aca481f4230d069fe8f77c7ab976ce0b8edba7fe32d4ac8ec3d4714cd11829",
+      "crates/baas-adapters/src/data.rs": "de35cbfaf00cb08c58128447f23e04d28569c7d4dc98882ab13ff8eef0976b73",
       "crates/baas-adapters/src/ti_language.rs": "da281547e9a649b7ce8992ec4f8218da44aad68673f8360a06073fc179544063"
     }
   }

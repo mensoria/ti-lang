@@ -1,0 +1,7 @@
+module approval_events.events;
+
+pub event DecisionRecorded {
+    field correlation: String;
+    field actorId: UserId;
+    field decision: String;
+}

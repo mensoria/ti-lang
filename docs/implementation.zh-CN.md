@@ -2,6 +2,10 @@
 
 状态：已有可运行参考实现和可选 Mensoria 事务宿主，2026-10-30。44 个编号回归场景均有可执行检查；这不等于完整语言标准、完整平台或生产认证。[验证回执](qualification/latest.json)记录精确源码哈希、数据库版本和测试结果。
 
+## Workspace 组织
+
+实现已拆为 `ti-language`、`ti-artifact`、`ti-cli` 和 `ti-host-mensoria`，根 `ti-lang` 保留兼容 facade 和唯一 `ti` binary。接口与所有权见[编译器分层](compiler-architecture.zh-CN.md)。`python3 scripts/check_workspace.py` 检查真实 Cargo 依赖方向和默认无宿主依赖闭包。`ti-project` 另行负责文件系统加载；项目语法采用独立[下一版草案](project-and-packages.zh-CN.md)，其中加载／导入／离线求值已实现，[项目回归回执](qualification/projects-latest.json)与既有语言／宿主资格化分开记录。源码移动后重建既有 44 场景回执；编译器／宿主新指纹需显式维护评审，不能静默替换活动 head。见[交付与迁移门槛](implementation-plan.zh-CN.md)。
+
 ## 运行语言
 
 使用 Rust 1.96.0 和仓库 Cargo.lock。
@@ -11,8 +15,8 @@ cargo run --locked -- check examples/approval.ti
 cargo run --locked -- compile examples/approval.ti
 cargo run --locked -- freeze examples/approval.ti
 cargo run --locked -- eval examples/approval.ti examples/create-request.json
-cargo test --locked
-cargo clippy --locked --all-targets --all-features -- -D warnings
+cargo test --workspace --locked
+cargo clippy --workspace --locked --all-targets --all-features -- -D warnings
 ```
 
 `check` 校验源码；`compile` 输出可检查 IR；`freeze` 输出冻结制品清单；`eval` 只返回候选结果。离线 harness 中的 actor 是测试上下文，不是经过认证的网络身份。
@@ -20,6 +24,17 @@ cargo clippy --locked --all-targets --all-features -- -D warnings
 冻结制品绑定源码、IR、编译器源码指纹、声明锁文件、版次／profile、依赖、确定性资源上限及宿主能力。相同模块版本不能覆盖。指纹标识源码／构建输入，不是二进制证明；消费方工作区需要另外记录实际依赖锁和构建证据。
 
 求值器使用显式工作栈，共享 100000 节点预算。测试覆盖恰好 100000 个节点与多一个、深层无环策略、同时赋值、旧／新不变量、候选事件、静态限制及输入／事件载荷 128 KiB 边界。`wire` 实现重复键拒绝、标准标量／事件标签、规范 Int64 和附录 C 指纹。内部 harness ID 对象不能作为公开 nominal ID 输入。
+
+## 运行已锁定项目
+
+```sh
+cargo run --locked -- check --manifest examples/package-design/leave/Ti.toml --workspace-root examples/package-design
+cargo run --locked -- compile --manifest examples/package-design/leave/Ti.toml --workspace-root examples/package-design
+cargo run --locked -- eval --manifest examples/package-design/leave/Ti.toml --workspace-root examples/package-design examples/create-request.json
+python3 scripts/verify_projects.py
+```
+
+有意修改源码后，使用相同 manifest／workspace 参数显式运行 `ti lock`。普通加载只读，拒绝缺失、过期或无效的锁。当前文件系统加载在 Unix 上验证，使用目录描述符及 O_NOFOLLOW；其他平台在提供等效适配器前拒绝加载。编译器接受 `use`、别名、`pub use`，检查所有模块／依赖，禁止扩展外部实体，复用既有纯审批语义。开发 IR 为 `ti.project-ir/0.2-dev.1`，不是最终公开 typed IR ABI。`freeze --manifest` 会拒绝，尚不提供 0.2 DB 激活／wire 协议，完整主／关联源码 span 仍待补充。
 
 ## 执行全部编号场景
 

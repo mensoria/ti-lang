@@ -1,0 +1,45 @@
+module leave.actions;
+use leave.model::{LeaveRequest};
+use leave.policies::{Applicant, Reviewer as CanReview};
+use leave.events::{LeaveApproved};
+
+create LeaveRequest(reason: String, days: Int64) {
+    allow actor.hasRole("leave.applicant");
+    set applicant = actor.id;
+    set reason = trim(input.reason);
+    set days = input.days;
+}
+
+action EditDraft(reason: String, days: Int64) on LeaveRequest {
+    from Draft to Draft;
+    allow Applicant(self);
+    set reason = trim(input.reason);
+    set days = input.days;
+}
+
+action Submit on LeaveRequest {
+    from Draft to Pending;
+    allow Applicant(self);
+}
+
+action Approve on LeaveRequest {
+    from Pending to Approved;
+    allow CanReview(self);
+    emit LeaveApproved {
+        requestId = self.id;
+        applicant = self.applicant;
+        days = self.days;
+    }
+}
+
+action Reject(reason: String) on LeaveRequest {
+    from Pending to Rejected;
+    allow CanReview(self);
+    require nonempty(input.reason) else "rejection_reason_required";
+    set rejectionReason = trim(input.reason);
+}
+
+action Withdraw on LeaveRequest {
+    from Pending to Withdrawn;
+    allow Applicant(self);
+}

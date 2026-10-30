@@ -10,7 +10,7 @@ not translated. Resolve translation discrepancies against English and update
 both manuscripts together.
 
 `docs/` and `examples/` are maintained sources. `scripts/build_book.py` generates
-21 matching chapters per language into ignored `book/{en,zh-CN}/src/`; edit the
+25 matching chapters per language into ignored `book/{en,zh-CN}/src/`; edit the
 manuscripts, not generated chapters. Configuration, theme and landing page live
 under `book/`; `book/{en,zh-CN}/home.md` owns the informative reader homepages. Generated site/build evidence are ignored outputs under `site/`
 and `dist/`. The build produces online HTML reading editions only.

@@ -44,7 +44,7 @@ def check_html():
         for name in ('index.html',):
             assert (site/lang/name).exists(),(lang,name)
         index = json.loads((site/lang/'ti-search-index.json').read_text())
-        assert len(index) == 21
+        assert len(index) == 25
         for record in index:
             target = (site/lang/record['url']).resolve()
             assert target in pages
@@ -77,6 +77,15 @@ def main():
         for token in tokens:
             if re.fullmatch(r'(?:TI_[A-Z_]+|[0-9]+(?: KiB)?|ti/0\.1|approval-core/0\.1)',token):
                 assert token in z[key],(key,token)
+    for stem,prefix,count in [('project-and-packages','PKG',26),('compiler-architecture','ARC',14),('implementation-plan','MIG',10)]:
+        a=(ROOT/f'docs/{stem}.md').read_text(); b=(ROOT/f'docs/{stem}.zh-CN.md').read_text()
+        ids=[f'{prefix}-{i:03}' for i in range(1,count+1)]
+        assert re.findall(r'\*\*('+prefix+r'-\d{3})\.\*\*',a)==ids
+        assert re.findall(r'\*\*('+prefix+r'-\d{3})\.\*\*',b)==ids
+        assert re.findall(r'```[^\n]*\n(.*?)```',a,re.S)==re.findall(r'```[^\n]*\n(.*?)```',b,re.S),(stem,'translated code changed')
+    for suffix in ('','.zh-CN'):
+        proposal=(ROOT/f'docs/package-conformance{suffix}.md').read_text()
+        assert re.findall(r'^\| (PC-\d{3}) \|',proposal,re.M)==[f'PC-{i:03}' for i in range(1,31)]
     for lang in ('en','zh-CN'):
         suffix='' if lang=='en' else '.zh-CN'
         cases=(ROOT/f'docs/conformance{suffix}.md').read_text()
@@ -84,7 +93,7 @@ def main():
         assert all(x in expected for x in re.findall(r'TI-\d{3}',cases))
         src=ROOT/'book'/lang/'src'
         files=re.findall(r'\]\(([^)]+\.md)\)',(src/'SUMMARY.md').read_text())
-        assert len(files)==21 and len(set(files))==21
+        assert len(files)==25 and len(set(files))==25
         for filename in files:
             content=(src/filename).read_text()
             assert len(re.findall(r'^```',content,re.M))%2==0,(lang,filename)
@@ -97,7 +106,7 @@ def main():
         for link in re.findall(r'\]\(([^)]+)\)',text):
             u=urlsplit(link)
             if not u.scheme and u.path: assert (path.parent/unquote(u.path)).exists(),(path,link)
-    print('Manuscripts: 54 matched clauses, identical EBNF, 44 matched case IDs, 21 chapters per language.')
+    print('Manuscripts: 54 matched clauses, identical EBNF, 44 matched case IDs, 25 chapters per language.')
     if args.html: check_html()
 
 

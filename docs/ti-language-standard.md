@@ -9,6 +9,10 @@
 | Initial profile | `approval-core/0.1` |
 | Source extension | `.ti` (provisional) |
 
+The next-edition [project/package proposal](project-and-packages.md) and
+[compiler architecture](compiler-architecture.md) are separate design documents.
+They do not extend the executable grammar of this profile.
+
 ## 1. Purpose, authority, and conformance
 
 **TI-001.** Ti is a declarative business language defining persisted entities,

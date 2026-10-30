@@ -1,0 +1,11 @@
+schema = "ti.project/1"
+
+[package]
+name = "acme.approval_events"
+version = "1.2.0"
+edition = "ti/0.2"
+profile = "approval-package/0.2"
+root = "approval_events"
+kind = "library"
+
+[dependencies]

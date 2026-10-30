@@ -110,6 +110,7 @@ struct Parser {
     ts: Vec<Token>,
     i: usize,
     depth: usize,
+    project: bool,
 }
 impl Parser {
     fn peek(&self) -> &str {
@@ -144,6 +145,7 @@ impl Parser {
             .is_some_and(|c| c.is_ascii_alphabetic() || c == '_')
             && !RESERVED.contains(&s.as_str())
             && !BUILTIN.contains(&s.as_str())
+            && (!self.project || !["pub", "use", "as"].contains(&s.as_str()))
         {
             Ok(s)
         } else {
@@ -392,6 +394,17 @@ impl Parser {
             return err("TI_MODEL", "invalid module version");
         }
         self.need(";")?;
+        self.declarations(module, version, false)
+            .map(|(model, _, _)| model)
+    }
+    fn declarations(
+        &mut self,
+        module: String,
+        version: i64,
+        project: bool,
+    ) -> Result<(Model, Set<String>, Vec<Import>)> {
+        let mut exports = Set::new();
+        let mut imports = vec![];
         let mut m = Model {
             module,
             version,
@@ -403,6 +416,55 @@ impl Parser {
         let mut names = Set::new();
         let mut count = 0;
         while self.peek() != "<eof>" {
+            let public = project && self.eat("pub");
+            if project && self.eat("use") {
+                let path = self.module_path()?;
+                self.need(":")?;
+                self.need(":")?;
+                self.need("{")?;
+                let mut items = vec![];
+                loop {
+                    let name = self.name()?;
+                    let alias = if self.eat("as") {
+                        self.name()?
+                    } else {
+                        name.clone()
+                    };
+                    items.push((name, alias));
+                    if items.len() > 256 {
+                        return err("TI_LIMIT", "too many import items");
+                    }
+                    if self.eat("}") {
+                        break;
+                    }
+                    self.need(",")?;
+                }
+                self.need(";")?;
+                imports.push(Import {
+                    module: path,
+                    items,
+                    public,
+                });
+                if imports.len() > 256 {
+                    return err("TI_LIMIT", "too many imports");
+                }
+                continue;
+            }
+            if public {
+                if !["entity", "event", "policy"].contains(&self.peek()) {
+                    return err("TI_SYNTAX", "pub applies only to declarations or use");
+                }
+                let name = self
+                    .ts
+                    .get(self.i + 1)
+                    .ok_or_else(|| crate::project::error("TI_SYNTAX", "missing public name"))?
+                    .text
+                    .clone();
+                exports.insert(name.clone());
+                if self.peek() == "entity" {
+                    exports.insert(format!("{name}Id"));
+                }
+            }
             count += 1;
             if count > 256 {
                 return err("TI_LIMIT", "too many declarations");
@@ -493,13 +555,64 @@ impl Parser {
                 _ => return err("TI_SYNTAX", "expected declaration"),
             }
         }
-        Ok(m)
+        Ok((m, exports, imports))
     }
+    fn module_path(&mut self) -> Result<String> {
+        let mut path = self.name()?;
+        while self.eat(".") {
+            path.push('.');
+            path.push_str(&self.name()?);
+        }
+        Ok(path)
+    }
+}
+
+#[derive(Clone)]
+pub(crate) struct Import {
+    pub module: String,
+    pub items: Vec<(String, String)>,
+    pub public: bool,
+}
+pub(crate) struct Module {
+    pub model: Model,
+    pub exports: Set<String>,
+    pub imports: Vec<Import>,
+}
+pub(crate) fn parse_module(source: &str) -> Result<Module> {
+    let ts = lex(source)?;
+    let mut p = Parser {
+        ts,
+        i: 0,
+        depth: 0,
+        project: true,
+    };
+    let result = (|| {
+        p.need("module")?;
+        let path = p.module_path()?;
+        p.need(";")?;
+        let (model, exports, imports) = p.declarations(path, 1, true)?;
+        Ok(Module {
+            model,
+            exports,
+            imports,
+        })
+    })();
+    result.map_err(|mut e: Diagnostic| {
+        let t = &p.ts[p.i];
+        e.line = t.line;
+        e.column = t.column;
+        e
+    })
 }
 
 pub(crate) fn parse(source: &str) -> Result<Model> {
     let ts = lex(source)?;
-    let mut p = Parser { ts, i: 0, depth: 0 };
+    let mut p = Parser {
+        ts,
+        i: 0,
+        depth: 0,
+        project: false,
+    };
     p.model().map_err(|mut e| {
         let t = &p.ts[p.i];
         e.line = t.line;

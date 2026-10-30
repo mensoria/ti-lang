@@ -1,0 +1,12 @@
+[package]
+name = "ti-cli"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+
+[dependencies]
+ti-project.workspace = true
+ti-language.workspace = true
+ti-artifact.workspace = true
+serde.workspace = true
+serde_json.workspace = true

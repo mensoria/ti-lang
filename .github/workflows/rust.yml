@@ -13,11 +13,14 @@ jobs:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
       - name: Install Rust 1.96.0
         run: rustup toolchain install 1.96.0 --profile minimal --component rustfmt,clippy
-      - run: cargo +1.96.0 fmt --check
-      - run: cargo +1.96.0 clippy --locked --all-targets --all-features -- -D warnings
-      - run: cargo +1.96.0 test --locked
+      - run: cargo +1.96.0 fmt --all --check
+      - run: cargo +1.96.0 clippy --workspace --locked --all-targets --all-features -- -D warnings
+      - run: cargo +1.96.0 test --workspace --locked
       - run: cargo +1.96.0 run --locked -- check examples/approval.ti
       - run: cargo +1.96.0 run --locked -- eval examples/approval.ti examples/create-request.json
+
+      - run: python3 scripts/check_workspace.py
+      - run: python3 scripts/verify_projects.py
 
       - name: Install pinned native test backend
         run: python3 scripts/setup_native_backend.py
@@ -30,4 +33,6 @@ jobs:
         uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02
         with:
           name: ti-native-qualification
-          path: .cache/qualification/
+          path: |
+            .cache/qualification/
+            .cache/project-qualification/

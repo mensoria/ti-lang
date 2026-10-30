@@ -1,0 +1,9 @@
+module leave.events;
+use leave.model::{LeaveRequestId};
+use approval_events.events::{DecisionRecorded};
+
+pub event LeaveApproved {
+    field requestId: LeaveRequestId;
+    field applicant: UserId;
+    field days: Int64;
+}

@@ -1,14 +1,46 @@
-[package]
-name = "ti-lang"
+[workspace]
+members = [".", "crates/ti-language", "crates/ti-artifact", "crates/ti-host-mensoria", "crates/ti-cli", "crates/ti-project"]
+default-members = ["."]
+resolver = "2"
+
+[workspace.package]
 version = "0.1.0"
 edition = "2021"
 rust-version = "1.96"
-description = "Ti declarative business language validator and pure evaluator"
 
-[dependencies]
+[workspace.dependencies]
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
 sha2 = "0.10"
+surrealdb = { version = "=3.3.0", default-features = false, features = ["protocol-http", "rustls"] }
+tokio = { version = "1", features = ["macros", "rt-multi-thread", "sync", "time"] }
+toml = "=0.8.23"
+libc = "0.2"
+ti-project = { path = "crates/ti-project", version = "0.1.0" }
+ti-language = { path = "crates/ti-language", version = "0.1.0" }
+ti-artifact = { path = "crates/ti-artifact", version = "0.1.0" }
+ti-cli = { path = "crates/ti-cli", version = "0.1.0" }
+ti-host-mensoria = { path = "crates/ti-host-mensoria", version = "0.1.0" }
+
+[package]
+name = "ti-lang"
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+description = "Ti language compatibility facade and CLI executable"
+
+[dependencies]
+ti-project.workspace = true
+ti-language.workspace = true
+ti-artifact.workspace = true
+ti-cli.workspace = true
+ti-host-mensoria = { workspace = true, optional = true }
+surrealdb = { workspace = true, optional = true }
+tokio = { workspace = true, optional = true }
+
+[dev-dependencies]
+serde_json.workspace = true
+sha2.workspace = true
 
 [[bin]]
 name = "ti"
@@ -16,16 +48,5 @@ path = "src/main.rs"
 
 [features]
 default = []
-mensoria-host = ["dep:surrealdb", "dep:tokio"]
-host-qualification = ["mensoria-host"]
-
-[dependencies.surrealdb]
-version = "=3.3.0"
-default-features = false
-features = ["protocol-http", "rustls"]
-optional = true
-
-[dependencies.tokio]
-version = "1"
-features = ["macros", "rt-multi-thread", "sync", "time"]
-optional = true
+mensoria-host = ["dep:ti-host-mensoria"]
+host-qualification = ["mensoria-host", "ti-host-mensoria/host-qualification", "dep:surrealdb", "dep:tokio"]

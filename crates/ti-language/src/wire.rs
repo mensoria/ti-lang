@@ -64,6 +64,17 @@ impl<'de> Deserialize<'de> for UniqueJson {
 pub fn strict_json(bytes: &[u8]) -> Result<serde_json::Value> {
     strict_json_bounded(bytes, 131072)
 }
+/// Strict Action envelope parsing with a fixed 132 KiB host budget.
+/// Typed inputs retain their separate 128 KiB budget in `decode_inputs`.
+pub fn decode_command_json(bytes: &[u8]) -> Result<serde_json::Value> {
+    strict_json_bounded(bytes, 135168)
+}
+/// Strict duplicate-key-rejecting JSON for bounded build documents.
+/// The caller supplies its declared document budget; scalar input decoding keeps
+/// its own fixed budget and never delegates authority to this function.
+pub fn decode_json_document(bytes: &[u8], max_bytes: usize) -> Result<serde_json::Value> {
+    strict_json_bounded(bytes, max_bytes)
+}
 pub(crate) fn strict_json_bounded(bytes: &[u8], limit: usize) -> Result<serde_json::Value> {
     if bytes.len() > limit {
         return err("TI_LIMIT", "encoded JSON exceeds declared budget");

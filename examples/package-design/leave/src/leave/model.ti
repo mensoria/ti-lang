@@ -1,0 +1,21 @@
+module leave.model;
+
+pub entity LeaveRequest {
+    field applicant: UserId;
+    field reason: String;
+    field days: Int64;
+    field rejectionReason: String?;
+
+    state status {
+        Draft initial;
+        Pending;
+        Approved final;
+        Rejected final;
+        Withdrawn final;
+    }
+
+    invariant positiveDays: days > 0;
+    invariant meaningfulReason: nonempty(reason);
+    invariant rejectionHasReason:
+        status != Rejected or nonempty(rejectionReason);
+}

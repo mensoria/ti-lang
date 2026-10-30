@@ -16,7 +16,7 @@ Ti 的名称取意于元素符号为 Ti 的钛。它是品牌意象，不是技�
 - [实施阶段与验收](docs/roadmap.zh-CN.md)
 - [请假审批源码](examples/approval.ti)
 
-在线书每种语言 21 章，含 54 条规范、完整 EBNF、指纹编码、审批示例、集成与验收参考。支持逐章语言切换和搜索。
+在线书每种语言 25 章，含 54 条规范、完整 EBNF、指纹编码、审批示例、集成与验收参考。支持逐章语言切换和搜索。
 
 ## 当前状态
 
@@ -34,7 +34,7 @@ python3 -m http.server 8000 --bind 127.0.0.1 --directory site
 
 打开 `http://127.0.0.1:8000/`。编写、构建与 GitHub Pages 发布说明见[出版指南](docs/publishing.md)。文档构建不能证明语言执行或生产符合性。
 
-实现许可证尚未选定；本仓库没有复制 Rip 上游代码。
+实现许可证尚未选定。
 
 ## 运行参考内核
 
@@ -51,3 +51,7 @@ TI_SURREAL_BIN="$PWD/.cache/native-backend/surreal" python3 scripts/verify_confo
 ```
 
 接入和边界见[实现说明](docs/implementation.zh-CN.md)。
+
+## 项目与编译器设计
+
+阅读[包／模块提案](docs/project-and-packages.zh-CN.md)、[编译器分层](docs/compiler-architecture.zh-CN.md)、[交付计划](docs/implementation-plan.zh-CN.md)及[包验收](docs/package-conformance.zh-CN.md)。工程采用六个 workspace 包；项目加载、显式锁定、`use`／`pub use` 和离线求值已实现，下一版部署仍独立推进。

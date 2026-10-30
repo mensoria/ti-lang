@@ -1,0 +1,45 @@
+{
+  "schema": "ti.workspace-extraction/1",
+  "baseline_commit": "924e1adac01b754c2f67e961f7a432db169c0cea",
+  "design_revision": 1,
+  "current_edition": "ti/0.1",
+  "proposed_edition": "ti/0.2",
+  "baseline_cases_passed": 44,
+  "baseline_tests_passed": 75,
+  "packages": [
+    "ti-lang",
+    "ti-language",
+    "ti-artifact",
+    "ti-cli",
+    "ti-host-mensoria",
+    "ti-project"
+  ],
+  "compatibility": {
+    "ir": {
+      "identical_bytes": true,
+      "sha256": "2184e386900aed6d15f98345079f12931a6050c7cdd5c3378d60fe8cdce99d53"
+    },
+    "eval": {
+      "identical_bytes": true,
+      "sha256": "cb36277d7f91e70812465b335acba6164070122ea45627cd1ba515fc7053ac55"
+    },
+    "mensoria_transaction.surql": {
+      "identical_bytes": true,
+      "sha256": "339ca3e1f025aa96521b2d1e4c88730aa0a1e2504e6abf2534e0c10bfd0b659b"
+    },
+    "mensoria_delivery.surql": {
+      "identical_bytes": true,
+      "sha256": "c48d148e089ce2e9e436471d3c0e1cab643e74bc9be37806725780b9b02b921b"
+    },
+    "mensoria_delivery_finish.surql": {
+      "identical_bytes": true,
+      "sha256": "eb5cb64be71445ad185649d47131b8946fbaf60cb279d0ca2805ecbae8572668"
+    }
+  },
+  "dependency_checks": "six packages; acyclic allowed edges; one binary; no host dependencies in default consumer",
+  "native_qualification": "latest.json",
+  "mensoria_adapter": "cargo check passed; HTTP end-to-end not exercised",
+  "shared_database_mutations": false,
+  "project_regression_tests_passed": 28,
+  "project_acceptance": "Partial regression coverage; no 0.2 host qualification"
+}

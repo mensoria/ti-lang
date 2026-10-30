@@ -1,0 +1,8 @@
+module leave.policies;
+use leave.model::{LeaveRequest};
+
+pub policy Applicant(request: LeaveRequest) =
+    actor.id == request.applicant;
+
+pub policy Reviewer(request: LeaveRequest) =
+    actor.hasRole("leave.reviewer") and actor.id != request.applicant;

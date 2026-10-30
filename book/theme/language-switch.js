@@ -28,7 +28,7 @@
     const link = document.createElement('a');
     link.textContent = name; link.lang = code; link.hreflang = code;
     const update = () => {
-      const anchor = /^#(?:ti|tc)-\d{3}$/.test(location.hash) ? location.hash : '';
+      const anchor = /^#(?:ti|tc|pkg|arc|mig|pc)-\d{3}$/.test(location.hash) ? location.hash : '';
       link.href = `${match[1]}${code}/${match[3]}${anchor}`;
     };
     update(); window.addEventListener('hashchange', update);

@@ -1,6 +1,6 @@
 # 交付阶段与验收
 
-状态：拟议顺序，已有初始 Rust 校验与纯求值切片，完整符合性和宿主集成待完成。[标准草案](ti-language-standard.zh-CN.md)定义基线，[符合性案例](conformance.zh-CN.md)定义实现证据。
+状态：已有基线编译／求值／原生宿主回归证据，完整平台与标准资格化仍独立进行；实现按 workspace 组织，保留基线语言行为。[标准草案](ti-language-standard.zh-CN.md)定义基线，[符合性案例](conformance.zh-CN.md)定义实现证据。
 
 ## 阶段一：冻结语义契约
 
@@ -44,3 +44,7 @@
 多对象动作、委派、多级／会签、计时器、外部付款、任意宿主扩展、AOT、热替换及金额／日期编解码均另立语义与失败契约。
 
 文档审查、本地测试、后端故障检查、CI 和业务验收分别报告。合成或纯求值测试不证明事务、恢复、撤权或生产就绪。
+
+## 项目与模块工作
+
+下一语言版次见[项目／包标准](project-and-packages.zh-CN.md)，按[编译器设计](compiler-architecture.zh-CN.md)和[交付门槛](implementation-plan.zh-CN.md)推进，使用独立[30 项包验收](package-conformance.zh-CN.md)。既有 TC 结果不代表新项目语法或激活通过。

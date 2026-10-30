@@ -6,6 +6,20 @@ not a claim of complete Ti standard, full Mensoria platform, or production
 qualification. The checked-in [qualification receipt](qualification/latest.json)
 records the exact source hashes, native backend and test results.
 
+## Workspace organization
+
+The implementation is extracted into `ti-language`, `ti-artifact`, `ti-cli` and
+`ti-host-mensoria`, plus the filesystem loader `ti-project`, with the root `ti-lang` compatibility facade and single `ti`
+binary. Source ownership and interfaces follow [compiler architecture](compiler-architecture.md).
+`python3 scripts/check_workspace.py` checks the actual Cargo edges and default
+host-free dependency closure. Project syntax uses the separate
+[next-edition draft](project-and-packages.md); its loading/import/offline evaluator
+slice is implemented and its [project regression receipt](qualification/projects-latest.json)
+is separate from legacy/native qualification.
+The existing 44-case report must be regenerated after source moves. New compiler
+and host fingerprints require explicit maintenance review, not silent active-head
+replacement. See [delivery and migration gates](implementation-plan.md).
+
 ## Run the language
 
 Use Rust 1.96.0 and the checked-in Cargo.lock.
@@ -15,8 +29,8 @@ cargo run --locked -- check examples/approval.ti
 cargo run --locked -- compile examples/approval.ti
 cargo run --locked -- freeze examples/approval.ti
 cargo run --locked -- eval examples/approval.ti examples/create-request.json
-cargo test --locked
-cargo clippy --locked --all-targets --all-features -- -D warnings
+cargo test --workspace --locked
+cargo clippy --workspace --locked --all-targets --all-features -- -D warnings
 ```
 
 `check` validates source; `compile` prints inspectable IR; `freeze` prints a frozen
@@ -36,6 +50,25 @@ limits, 128 KiB input/event payload boundaries, scalar strings and nominal IDs a
 checked. `wire` implements duplicate-key rejection, standard scalar/event tags,
 canonical Int64 values and Appendix C fingerprint framing. Internal harness ID
 objects are not accepted as public nominal scalar values.
+
+## Run a locked project
+
+```sh
+cargo run --locked -- check --manifest examples/package-design/leave/Ti.toml --workspace-root examples/package-design
+cargo run --locked -- compile --manifest examples/package-design/leave/Ti.toml --workspace-root examples/package-design
+cargo run --locked -- eval --manifest examples/package-design/leave/Ti.toml --workspace-root examples/package-design examples/create-request.json
+python3 scripts/verify_projects.py
+```
+
+After intentional changes, run `ti lock` with the same manifest/workspace options.
+Normal loading is read-only and rejects missing/stale/invalid locks. Current
+filesystem loading is qualified on Unix and uses directory descriptors with
+O_NOFOLLOW; other platforms fail closed until an equivalent adapter is provided.
+The project compiler accepts `use`, aliases and `pub use`, validates every module
+and dependency, prevents foreign entity extension and executes the existing pure
+approval semantics. Its development IR is `ti.project-ir/0.2-dev.1`, not a final
+public typed IR ABI. `freeze --manifest` is rejected: no 0.2 database activation
+or wire protocol is provided. Complete source/related spans remain pending.
 
 ## Run all 44 numbered scenarios
 
