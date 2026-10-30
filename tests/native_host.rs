@@ -607,3 +607,34 @@ async fn tc_033_result_read_revocation() {
     sql(&f.admin, "UPDATE ti_head SET roles.read=[];", json!({})).await;
     assert_eq!(b.execute(&c).await.unwrap_err().code, "TI_ACCESS_DENIED");
 }
+#[test]
+fn tc_039_command_envelope_budget() {
+    let mut inputs: std::collections::BTreeMap<String, Value> = (0..8)
+        .map(|i| (format!("p{i}"), Value::String("a".repeat(16384))))
+        .collect();
+    let overhead = serde_json::to_vec(&inputs).unwrap().len() - 131072;
+    inputs.insert("p0".into(), Value::String("a".repeat(16384 - overhead)));
+    let c = Command {
+        key: "full-input".into(),
+        incarnation: 1,
+        artifact: "a".repeat(64),
+        entity: "Item".into(),
+        action: "Create".into(),
+        record_id: "one".into(),
+        expected_revision: None,
+        inputs,
+    };
+    let raw = serde_json::to_vec(&c).unwrap();
+    assert!(raw.len() > 131072);
+    assert!(Command::decode(&raw).is_ok());
+    let mut too_large = c;
+    too_large
+        .inputs
+        .insert("p0".into(), Value::String("a".repeat(16385 - overhead)));
+    assert_eq!(
+        Command::decode(&serde_json::to_vec(&too_large).unwrap())
+            .unwrap_err()
+            .code,
+        "TI_LIMIT"
+    );
+}

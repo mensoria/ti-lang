@@ -92,7 +92,7 @@ pub struct Command {
 }
 impl Command {
     pub fn decode(bytes: &[u8]) -> Result<Self> {
-        let mut json = wire::strict_json(bytes)?;
+        let mut json = wire::strict_json_bounded(bytes, 135168)?;
         let inputs = wire::decode_inputs(
             &serde_json::to_vec(&json["inputs"]).map_err(|_| failure("TI_INPUT"))?,
         )?;

@@ -62,8 +62,11 @@ impl<'de> Deserialize<'de> for UniqueJson {
     }
 }
 pub fn strict_json(bytes: &[u8]) -> Result<serde_json::Value> {
-    if bytes.len() > 131072 {
-        return err("TI_LIMIT", "encoded inputs exceed 128 KiB");
+    strict_json_bounded(bytes, 131072)
+}
+pub(crate) fn strict_json_bounded(bytes: &[u8], limit: usize) -> Result<serde_json::Value> {
+    if bytes.len() > limit {
+        return err("TI_LIMIT", "encoded JSON exceeds declared budget");
     }
     serde_json::from_slice::<UniqueJson>(bytes)
         .map(|v| v.0)

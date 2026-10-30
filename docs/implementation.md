@@ -120,7 +120,8 @@ adapter with an idempotent-effect contract may select RetrySafe. An unfinished o
 unknown attempt requires reconciliation and cannot be blindly redelivered.
 No email/HTTP side effect or automatic platform worker is installed here.
 
-Other binding limits: keys 128 bytes, logical IDs 256 bytes, 64 inputs, 256 native
+Other binding limits: public command envelopes 132 KiB (inputs retain their full
+128 KiB budget), keys 128 bytes, logical IDs 256 bytes, 64 inputs, 256 native
 role mappings/aliases and actor roles, 128-byte role names, three seconds per
 native query. Model scalar/aggregate limits also apply. Runtime connections are
 provided by the existing platform; this crate does not create another scheduler.

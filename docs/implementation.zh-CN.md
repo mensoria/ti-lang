@@ -57,7 +57,7 @@ TI_SURREAL_BIN="$PWD/.cache/native-backend/surreal" python3 scripts/verify_confo
 
 事件适配器只向当前事件角色披露标准标签载荷。`begin_delivery` 持久记录尝试；`finish_delivery` 记录 Delivered、显式 RetrySafe 或 Unknown。只有具备幂等外部效果契约的适配器才能选择 RetrySafe。中断或未知尝试必须核对，不能盲目重放。当前不安装邮件／HTTP 副作用或自动平台 worker。
 
-其他宿主上限：键 128 字节、ID 256 字节、64 个输入、256 个原生角色映射／别名和 actor 角色、角色名 128 字节、每条查询三秒；还执行语言标量／聚合限制。复用现有平台连接，不另建调度器。
+其他宿主上限：公开请求整包 132 KiB（保留完整 128 KiB 输入预算）、键 128 字节、ID 256 字节、64 个输入、256 个原生角色映射／别名和 actor 角色、角色名 128 字节、每条查询三秒；还执行语言标量／聚合限制。复用现有平台连接，不另建调度器。
 
 ## DataFacade 接入
 

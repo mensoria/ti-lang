@@ -1,6 +1,6 @@
 {
   "schema": "ti.qualification/1",
-  "time_utc": "20261030T042432.612298Z",
+  "time_utc": "20261030T042932.381710Z",
   "claim": "44 numbered regression scenarios, not full implementation or platform certification",
   "platform": "macOS-26.6.2-arm64-arm-64bit-Mach-O",
   "rust": "rustc 1.96.0 (ac68faa20 2026-05-25) (Homebrew)",
@@ -12,15 +12,15 @@
     "src/evaluator.rs": "15c41b7f89b8771678ac5ce722cfb00640871a732c9ed48aab29d15da25a1519",
     "src/lib.rs": "83d5d94ecafcc800a298746538e8f46cad9d12348b02e057626782988e29d4c3",
     "src/main.rs": "bba7cc3fbecff40a591db8726144b77c0018990978e2e973d82778e0402b88a9",
-    "src/mensoria.rs": "a74f7b661cc1050c1dab4a048aebe2d3511b0f2be570abc474710381f1eb6b76",
+    "src/mensoria.rs": "bc2b7de693c857e6bc73d953be1eea132f49c33118924880da57502968c02c06",
     "src/mensoria_delivery.surql": "c48d148e089ce2e9e436471d3c0e1cab643e74bc9be37806725780b9b02b921b",
     "src/mensoria_delivery_finish.surql": "eb5cb64be71445ad185649d47131b8946fbaf60cb279d0ca2805ecbae8572668",
     "src/mensoria_transaction.surql": "339ca3e1f025aa96521b2d1e4c88730aa0a1e2504e6abf2534e0c10bfd0b659b",
     "src/parser.rs": "71e84fbfbc664590ab988e3a426807048f5abe28b23efba05cc6745ff6e6f62f",
-    "src/wire.rs": "1651376d4ca155c94e86413b9995d9f8f722829e231c8bc870e52eda8330ecd5",
+    "src/wire.rs": "5516a39584da719cc3a56ab22681d38f580d430f2924b0fef32ac2d38b75407b",
     "tests/conformance.rs": "ae943e0f5371c2a996ade696cd9d596abd5fde226186ed36a34c09c01d354637",
     "tests/language.rs": "0408b3ba9e7b6b3c49b86ee00c43dada1c2247d36515fda5a542d7e30237096f",
-    "tests/native_host.rs": "ae877c2b56b9aa1528e377041a37c7a5b473d996815e406149014ddd2abfde9c",
+    "tests/native_host.rs": "6f5f3ef768d3322564ff929fdfe0b4fbb248c998044c3ce6ee2259225544c92b",
     "tests/support/mod.rs": "d3940816aef511b1e23534700c4836e538008d3262bde559881794288628db81",
     "tests/support/proxy.rs": "753b39640bdece62a64ecf536705fbad1646168c00f41304e5acdb6cc7adc002"
   },
@@ -37,7 +37,7 @@
         "conformance"
       ],
       "exit_code": 0,
-      "log_sha256": "d8c0b2a838c155523544d8e5cd10dfbfbb8e6460fe9218d55a260cc95e4b5130"
+      "log_sha256": "31b52754bb336d18549c96f57a54347f0bd09d9706b8e5d715cc65dc8edd2aa1"
     },
     {
       "suite": "native",
@@ -53,7 +53,7 @@
         "--test-threads=2"
       ],
       "exit_code": 0,
-      "log_sha256": "dc5ff10aab76921136bd094a466a813fc05347f3513943b9564c420322d6b2c1"
+      "log_sha256": "dc2f4452489b0676fdd31dd1064b92864a790e36d411793f0c3e3e5703947cb9"
     }
   ],
   "cases": [
@@ -338,6 +338,7 @@
       "id": "TC-039",
       "status": "passed",
       "tests": [
+        "tc_039_command_envelope_budget",
         "tc_039_deep_acyclic_policy",
         "tc_039_encoded_payload_limits",
         "tc_039_expression_depth",
@@ -399,7 +400,7 @@
   },
   "server_binary_sha256": "db59b4e90b6c8bd481e0f1c6ce83461803d1fd4a51839906779a93d579dd132d",
   "passed_cases": 44,
-  "passed_tests": 74,
+  "passed_tests": 75,
   "status": "passed",
   "mensoria_adapter": {
     "status": "cargo-check-passed",
