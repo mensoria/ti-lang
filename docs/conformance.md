@@ -65,5 +65,6 @@ persisted outcomes. Retain failed and unknown runs. A deterministic simulator is
 useful but does not replace real transaction and response-loss qualification.
 
 Documentation review, validator tests, evaluator tests, host fault tests, CI,
-and business acceptance are separate evidence categories. All are currently
-unexecuted for Ti; prose examples are not test results.
+and business acceptance are separate evidence categories. The full 44-case corpus and host qualification remain unexecuted; selected Rust
+validator/evaluator checks are recorded in [implementation status](implementation.md).
+Prose examples are not test results.

@@ -1,6 +1,6 @@
 # Delivery stages and acceptance
 
-Status: proposed sequence. No implementation milestone is complete.
+Status: proposed sequence. An initial Rust validator and pure-evaluator slice exists; full conformance and host integration remain pending.
 The [standard draft](ti-language-standard.md) specifies the baseline;
 [conformance cases](conformance.md) define required implementation evidence.
 

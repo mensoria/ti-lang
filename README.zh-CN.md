@@ -20,7 +20,7 @@ Ti 的名称取意于元素符号为 Ti 的钛。它是品牌意象，不是技�
 
 ## 当前状态
 
-草案 0.1，语言版次 ti/0.1。尚无解析器、编译器、执行器或可运行示例。
+草案 0.1，语言版次 ti/0.1。已有 Rust 参考解析器、语义校验器与纯动作求值器；数据库宿主和完整符合性验证尚未实现。
 
 第一版聚焦单对象、单级审批。受管对象的公开写入只走动作，包含创建和草稿编辑。通用函数、任意 SQL、循环、外部 I/O、多对象动作和长流程编排不在首版范围。
 
@@ -35,3 +35,12 @@ python3 -m http.server 8000 --bind 127.0.0.1 --directory site
 打开 `http://127.0.0.1:8000/`。编写、构建与 GitHub Pages 发布说明见[出版指南](docs/publishing.md)。文档构建不能证明语言执行或生产符合性。
 
 实现许可证尚未选定；本仓库没有复制 Rip 上游代码。
+
+## 运行参考内核
+
+```sh
+cargo run --locked -- check examples/approval.ti
+cargo run --locked -- eval examples/approval.ti examples/create-request.json
+```
+
+能力与待完成边界见[实现说明](docs/implementation.md)。求值只返回候选记录与事件，不认证身份，也不向 Mensoria DB 提交。

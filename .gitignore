@@ -7,3 +7,4 @@ __pycache__/
 .DS_Store
 book/en/src/
 book/zh-CN/src/
+/target/

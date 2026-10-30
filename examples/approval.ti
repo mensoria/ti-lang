@@ -1,4 +1,4 @@
-// Illustrative syntax only. There is no Ti compiler or executor yet.
+// Reference evaluator model. Database host integration is not implemented.
 module leave version 1;
 
 entity LeaveRequest {
@@ -69,7 +69,7 @@ action Withdraw on LeaveRequest {
 }
 
 event LeaveApproved {
-    requestId: LeaveRequestId;
-    applicant: UserId;
-    days: Int64;
+    field requestId: LeaveRequestId;
+    field applicant: UserId;
+    field days: Int64;
 }

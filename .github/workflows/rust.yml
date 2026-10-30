@@ -1,0 +1,20 @@
+name: Rust language core
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  core:
+    runs-on: ubuntu-24.04
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+      - name: Install Rust 1.96.0
+        run: rustup toolchain install 1.96.0 --profile minimal --component rustfmt,clippy
+      - run: cargo +1.96.0 fmt --check
+      - run: cargo +1.96.0 clippy --locked --all-targets -- -D warnings
+      - run: cargo +1.96.0 test --locked
+      - run: cargo +1.96.0 run --locked -- check examples/approval.ti
+      - run: cargo +1.96.0 run --locked -- eval examples/approval.ti examples/create-request.json

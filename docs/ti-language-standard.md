@@ -4,7 +4,7 @@
 | --- | --- |
 | Language | Ti |
 | Edition | `ti/0.1` |
-| Status | Proposed normative draft; unimplemented |
+| Status | Normative draft; initial reference core, no host conformance |
 | Date | 2026-10-29 |
 | Initial profile | `approval-core/0.1` |
 | Source extension | `.ti` (provisional) |

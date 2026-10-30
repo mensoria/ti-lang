@@ -1,0 +1,10 @@
+{
+  "entity": "LeaveRequest",
+  "action": "Create",
+  "actor": {"id": "alice", "roles": ["leave.applicant"]},
+  "input": {
+    "reason": {"type": "String", "value": "Family leave"},
+    "days": {"type": "Int64", "value": "3"}
+  },
+  "new_id": "leave-1"
+}

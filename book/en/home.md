@@ -51,7 +51,7 @@ business state, operation result, audit, and outbox atomically. See
 
 ## Document status
 
-This is a proposed standard, with no Ti compiler or executor yet. The first profile
+This is a proposed standard, with an initial Rust validator and pure evaluator, and no database host yet. The first profile
 covers single-object, single-stage approval. Publication does not establish runtime
 conformance.
 

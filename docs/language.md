@@ -30,8 +30,7 @@ action Reject(reason: String) on LeaveRequest {
 ```
 
 The complete [leave approval model](../examples/approval.ti) includes creation,
-draft editing, submission, approval, rejection, and withdrawal. It is illustrative
-source, not a runnable program.
+draft editing, submission, approval, rejection, and withdrawal. It can be checked and evaluated with the Rust reference core; it has no database host.
 
 All assignment expressions see the old record; assignments apply simultaneously.
 Invariants and emitted payloads see the candidate record. Business state, audit,

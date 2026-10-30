@@ -14,8 +14,8 @@ metaphor, not a technical guarantee.
 ## Status
 
 Design draft, 2026-10-29. This repository contains a proposed language model and
-illustrative source. There is no parser, compiler, executor, or runnable example
-yet. Syntax, file extension, and integration contracts are provisional.
+a reference model. An initial Rust validator, inspectable IR compiler and pure evaluator are now
+available; the database host and full conformance corpus are not implemented. Syntax, file extension, and integration contracts are provisional.
 
 ## First use case
 
@@ -66,3 +66,14 @@ python3 -m http.server 8000 --bind 127.0.0.1 --directory site
 Read the [authoring and publication guide](docs/publishing.md) for source ownership,
 verified tool installation, checks, and GitHub Pages setup. Website publication
 is separate from language implementation conformance.
+
+## Run the reference core
+
+```sh
+cargo run --locked -- check examples/approval.ti
+cargo run --locked -- compile examples/approval.ti
+cargo run --locked -- eval examples/approval.ti examples/create-request.json
+```
+
+See [implementation and limits](docs/implementation.md). Evaluation returns a
+candidate and events only; it does not authenticate or commit to Mensoria DB.

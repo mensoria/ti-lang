@@ -1,6 +1,6 @@
 # 交付阶段与验收
 
-状态：拟议顺序，尚无实现里程碑完成。[标准草案](ti-language-standard.zh-CN.md)定义基线，[符合性案例](conformance.zh-CN.md)定义实现证据。
+状态：拟议顺序，已有初始 Rust 校验与纯求值切片，完整符合性和宿主集成待完成。[标准草案](ti-language-standard.zh-CN.md)定义基线，[符合性案例](conformance.zh-CN.md)定义实现证据。
 
 ## 阶段一：冻结语义契约
 

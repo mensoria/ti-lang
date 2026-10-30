@@ -32,11 +32,11 @@ def chapters(lang):
         pages[slug + '.md'] = read(source, lang)
     example = (ROOT / 'examples/approval.ti').read_text()
     if lang == 'zh-CN':
-        example = example.replace('// Illustrative syntax only. There is no Ti compiler or executor yet.',
-                                  '// 说明性语法；目前尚无 Ti 编译器或执行器。')
+        example = example.replace('// Reference evaluator model. Database host integration is not implemented.',
+                                  '// 参考求值模型；数据库宿主尚未实现。')
     pages['approval.md'] = ('# Approval walkthrough\n\n' if lang == 'en' else '# 审批示例详解\n\n') + (
-        'Illustrative source; not executable. The model implements single-stage leave approval.\n\n'
-        if lang == 'en' else '说明性源码，尚不可执行。模型覆盖单级请假审批。\n\n') + '```text\n' + example + '```\n\n' + (
+        'Reference model for the Rust pure evaluator. No database host is connected.\n\n'
+        if lang == 'en' else 'Rust 纯求值器参考模型，覆盖单级请假审批；未连接数据库宿主。\n\n') + '```text\n' + example + '```\n\n' + (
         'Draft → Pending → Approved / Rejected / Withdrawn. Draft editing stays in Draft.\n\n'
         'A reviewer cannot approve their own request. Concurrent approve/withdraw commands compete on one revision. '
         'Assignments see the old record; events see the candidate. Lost responses require original-operation reconciliation.\n'
@@ -51,6 +51,7 @@ def chapters(lang):
             content = content.replace(f']({stem}.zh-CN.md)', f']({dest}.md)')
             content = content.replace(f']({stem}.md)', f']({dest}.md)')
         content = content.replace('](../examples/approval.ti)', '](approval.md)')
+        content = content.replace('](implementation.md)', '](https://github.com/mensoria/ti-lang/blob/main/docs/implementation.md)')
         # Chinese source's English authority link must go to the English book.
         if lang == 'zh-CN':
             content = content.replace('[英文源文](index.md)', '[英文源文](../en/01-purpose.html)')
